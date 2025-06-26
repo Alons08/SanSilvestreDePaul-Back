@@ -24,7 +24,7 @@ public class Apoderado {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private User user; // Relación obligatoria
+    private User user; // Relación para que cada apoderado tenga un user
 
     @Column(nullable = false, length = 50)
     private String nombre;
@@ -46,6 +46,7 @@ public class Apoderado {
     @Column(length = 100)
     private String email;
 
+    @Column(name = "lugar_trabajo")
     private String lugarTrabajo;
     private String cargo;
 

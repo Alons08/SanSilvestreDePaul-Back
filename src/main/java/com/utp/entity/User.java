@@ -35,7 +35,7 @@ public class User implements UserDetails {
     Role role;
 
     @OneToOne(mappedBy = "user")
-    private Apoderado apoderado; // Relación opcional (solo para usuarios APODERADO)
+    private Apoderado apoderado; // Relación opcional (para usuarios APODERADO si es obligatorio)
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

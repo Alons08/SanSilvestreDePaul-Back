@@ -47,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.Apoderado) //se le asigna automáticamente el rol de user (quiza cambiemos esto)
+                .role(Role.Apoderado) //se le asigna automáticamente el rol de apoderado (quiza cambiemos esto)
                 .build();
 
         userRepository.save(user);
