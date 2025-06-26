@@ -23,14 +23,19 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
+
     @Column(nullable = false)
     String username;
-    String lastname;
-    String firstname;
-    String country;
+
+    @Column(nullable = false)
     String password;
+
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     Role role;
+
+    @OneToOne(mappedBy = "user")
+    private Apoderado apoderado; // Relación opcional (solo para usuarios APODERADO)
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

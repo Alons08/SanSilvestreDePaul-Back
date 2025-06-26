@@ -47,10 +47,7 @@ public class AuthServiceImpl implements AuthService {
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
-                .country(request.getCountry())
-                .role(Role.USER) //se le asigna automáticamente el rol de user (quiza cambiemos esto)
+                .role(Role.Apoderado) //se le asigna automáticamente el rol de user (quiza cambiemos esto)
                 .build();
 
         userRepository.save(user);
