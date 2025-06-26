@@ -33,7 +33,7 @@ public class User implements UserDetails {
     String username;
 
     @NotBlank(message = "La contraseña no puede estar vacía")
-    @Size(min = 8, max = 255, message = "La contraseña debe tener entre 8 y 15 caracteres")
+    @Size(min = 8, max = 255, message = "La contraseña debe tener entre 8 y 255 caracteres")
     @Column(nullable = false)
     String password;
 
@@ -42,7 +42,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     Role role;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Apoderado apoderado;
     // Relación opcional (para usuarios APODERADO si es obligatorio)
 

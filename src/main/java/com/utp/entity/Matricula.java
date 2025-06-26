@@ -6,8 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.List;
 
 @Data
 @Builder
@@ -46,4 +48,16 @@ public class Matricula {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private EstadoMatricula estado = EstadoMatricula.Pendiente;
+
+    // Usuario que realizó la matrícula (puede ser secretaria o apoderado)
+    @ManyToOne
+    @JoinColumn(name = "usuario_matricula_id")
+    private User usuarioMatricula;
+
+    @Column(name = "observaciones", length = 255)
+    private String observaciones;
+
+    @OneToMany(mappedBy = "matricula", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<FechaPago> fechasPago;
 }

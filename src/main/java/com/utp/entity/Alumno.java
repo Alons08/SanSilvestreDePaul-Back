@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -66,5 +67,6 @@ public class Alumno {
     private Boolean estado = true;
 
     @OneToMany(mappedBy = "alumno")
+    @JsonIgnore
     private List<Matricula> matriculas;
 }

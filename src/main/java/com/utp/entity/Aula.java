@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.sql.Time;
+import java.time.LocalTime;
 
 @Data
 @Builder
@@ -39,9 +39,9 @@ public class Aula {
 
     @NotNull(message = "La hora de inicio no puede ser nula")
     @Column(name = "hora_inicio", nullable = false)
-    private Time horarioInicio;
+    private LocalTime horarioInicio;
 
     @NotNull(message = "La hora de fin no puede ser nula")
     @Column(name = "hora_fin", nullable = false)
-    private Time horarioFin;
+    private LocalTime horarioFin;
 }
