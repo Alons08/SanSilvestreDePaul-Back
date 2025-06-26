@@ -1,6 +1,9 @@
 package com.utp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "user", uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
+@Table(name = "users")
 @Data
 @Builder
 @AllArgsConstructor
@@ -24,18 +27,24 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "El nombre de usuario no puede estar vacío")
+    @Size(min = 3, max = 40, message = "El nombre de usuario debe tener entre 3 y 40 caracteres")
+    @Column(nullable = false, unique = true, length = 40)
     String username;
 
+    @NotBlank(message = "La contraseña no puede estar vacía")
+    @Size(min = 8, max = 255, message = "La contraseña debe tener entre 8 y 15 caracteres")
     @Column(nullable = false)
     String password;
 
+    @NotNull(message = "El rol no puede ser nulo")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     Role role;
 
     @OneToOne(mappedBy = "user")
-    private Apoderado apoderado; // Relación opcional (para usuarios APODERADO si es obligatorio)
+    private Apoderado apoderado;
+    // Relación opcional (para usuarios APODERADO si es obligatorio)
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

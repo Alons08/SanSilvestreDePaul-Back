@@ -1,21 +1,17 @@
 package com.utp.agregates.request;
 
-import lombok.AllArgsConstructor;
+import com.utp.entity.Role;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class RegisterRequest {
 
-    //sin id y sin rol
-    String username;
-    String password;
-    String firstname;
-    String lastname;
-    String country;
+    private String username;
+    private String password;
+    private Role role;
 
 }

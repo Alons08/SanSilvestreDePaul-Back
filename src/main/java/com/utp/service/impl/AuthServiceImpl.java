@@ -11,8 +11,10 @@ import com.utp.repository.UserRepository;
 import com.utp.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,27 +29,41 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getUsername(),
-                request.getPassword()
-        ));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()
+                    )
+            );
 
-        UserDetails user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow();
+            UserDetails user = userRepository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        String token = jwtService.getToken(user);
+            return AuthResponse.builder()
+                    .token(jwtService.getToken(user))
+                    .build();
 
-        return AuthResponse.builder()
-                .token(token)
-                .build();
+        } catch (BadCredentialsException e) {
+            throw new BadCredentialsException("Credenciales inválidas");
+        }
     }
 
     @Override
     public AuthResponse register(RegisterRequest request) {
+        // Validación adicional manual (opcional)
+        if (request.getPassword() == null || request.getPassword().trim().length() < 8 || request.getPassword().trim().length() > 15) {
+            throw new RuntimeException("La contraseña debe tener entre 8 y 15 caracteres");
+        }
+
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("El nombre de usuario ya existe");
+        }
+
         User user = User.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.Apoderado) //se le asigna automáticamente el rol de apoderado (quiza cambiemos esto)
+                .username(request.getUsername().trim())
+                .password(passwordEncoder.encode(request.getPassword().trim()))
+                .role(request.getRole() != null ? request.getRole() : Role.Apoderado)
                 .build();
 
         userRepository.save(user);
@@ -56,5 +72,4 @@ public class AuthServiceImpl implements AuthService {
                 .token(jwtService.getToken(user))
                 .build();
     }
-
 }

@@ -1,6 +1,7 @@
 package com.utp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,9 +19,12 @@ public class Grado {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String nombre;
+    @NotBlank(message = "El nombre del grado no puede estar vacío")
+    @Size(max = 50, message = "El nombre del grado no puede exceder los 50 caracteres")
+    @Column(name = "nombre_grado", nullable = false, length = 50)
+    private String nombreGrado;
 
+    @NotNull(message = "El nivel educativo no puede ser nulo")
     @Enumerated(EnumType.STRING)
     private NivelEducativo nivel;
 
@@ -31,5 +35,5 @@ public class Grado {
     private List<GradoCurso> cursos;
 
     @OneToMany(mappedBy = "grado")
-    private List<Matricula> matriculas;  // Nueva relación agregada
+    private List<Matricula> matriculas;
 }

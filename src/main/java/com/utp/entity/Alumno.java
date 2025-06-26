@@ -1,6 +1,7 @@
 package com.utp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,23 +20,32 @@ public class Alumno {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "El documento de identidad no puede ser nulo")
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "documento_identidad_id", nullable = false)
     private DocumentoIdentidad documentoIdentidad;
 
+    @NotNull(message = "El apoderado no puede ser nulo")
     @ManyToOne
     @JoinColumn(name = "apoderado_id", nullable = false)
-    private Apoderado apoderado;  // Relación directa con Apoderado
+    private Apoderado apoderado;
 
+    @NotBlank(message = "El nombre no puede estar vacío")
+    @Size(max = 50, message = "El nombre no puede exceder los 50 caracteres")
     @Column(nullable = false, length = 50)
     private String nombre;
 
+    @NotBlank(message = "El apellido no puede estar vacío")
+    @Size(max = 50, message = "El apellido no puede exceder los 50 caracteres")
     @Column(nullable = false, length = 50)
     private String apellido;
 
+    @NotNull(message = "La fecha de nacimiento no puede ser nula")
+    @Past(message = "La fecha de nacimiento debe ser en el pasado")
     @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;
 
+    @NotNull(message = "El género no puede ser nulo")
     @Enumerated(EnumType.STRING)
     private Genero genero;
 
@@ -57,5 +67,4 @@ public class Alumno {
 
     @OneToMany(mappedBy = "alumno")
     private List<Matricula> matriculas;
-
 }

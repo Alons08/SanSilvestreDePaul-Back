@@ -1,17 +1,16 @@
 package com.utp.agregates.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@Builder //construir objetos...
-@AllArgsConstructor
-@NoArgsConstructor
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Builder
 public class LoginRequest {
 
-    String username;
-    String password;
+    private String username;
+    private String password;
 
 }
