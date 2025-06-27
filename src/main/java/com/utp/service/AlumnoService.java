@@ -18,7 +18,7 @@ public interface AlumnoService {
     
     AlumnoInfoResponse actualizarAlumno(Long id, AlumnoRequest request);
     
-    void eliminarAlumno(Long id);
+
     
     List<AlumnoInfoResponse> buscarAlumnosPorNombre(String nombre);
 }

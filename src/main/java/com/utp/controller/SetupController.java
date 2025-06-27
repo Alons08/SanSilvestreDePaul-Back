@@ -4,7 +4,6 @@ import com.utp.agregates.request.*;
 import com.utp.agregates.response.*;
 import com.utp.entity.*;
 import com.utp.repository.*;
-import com.utp.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,7 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Year;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +32,7 @@ public class SetupController {
     private final FechaPagoRepository fechaPagoRepository;
     private final CursoRepository cursoRepository;
     private final GradoCursoRepository gradoCursoRepository;
-    private final UserService userService;
+    private final MatriculaRepository matriculaRepository;
 
     // ============= APODERADOS =============
     
@@ -453,9 +455,102 @@ public class SetupController {
                 .build();
             aulaRepository.save(aula2);
 
-            return ResponseEntity.ok("Datos de prueba creados exitosamente (3 grados, 6 cursos, 18 asociaciones grado-curso, 1 docente, 2 aulas)");
+            // ============= CREAR USUARIO Y APODERADO DE PRUEBA =============
+            
+            // Crear usuario para apoderado
+            User userApoderado = User.builder()
+                .username("apoderado_prueba")
+                .password("$2a$10$7XgvQjK1OqZ8QxqQZ8QxqO7XgvQjK1OqZ8QxqQZ8QxqO7XgvQjK1O") // password: "123456"
+                .role(Role.Apoderado)
+                .estado(true)
+                .build();
+            userRepository.save(userApoderado);
+
+            // Crear documento para apoderado
+            DocumentoIdentidad apoderadoDoc = DocumentoIdentidad.builder()
+                .tipoDocumento(TipoDocumento.DNI)
+                .numeroDocumento("87654321")
+                .build();
+
+            // Crear apoderado
+            Apoderado apoderado = Apoderado.builder()
+                .documentoIdentidad(apoderadoDoc)
+                .user(userApoderado)
+                .nombre("Carlos")
+                .apellido("Mendoza")
+                .parentesco(Parentesco.Padre)
+                .direccion("Av. Los Padres 456")
+                .departamento("Lima")
+                .provincia("Lima")
+                .distrito("Miraflores")
+                .telefono("998877665")
+                .email("carlos.mendoza@email.com")
+                .lugarTrabajo("Empresa ABC")
+                .cargo("Gerente")
+                .build();
+            apoderadoRepository.save(apoderado);
+
+            // ============= CREAR ALUMNO DE PRUEBA =============
+            
+            DocumentoIdentidad alumnoDoc = DocumentoIdentidad.builder()
+                .tipoDocumento(TipoDocumento.DNI)
+                .numeroDocumento("11223344")
+                .build();
+
+            Alumno alumno = Alumno.builder()
+                .documentoIdentidad(alumnoDoc)
+                .apoderado(apoderado)
+                .nombre("Ana")
+                .apellido("Mendoza")
+                .fechaNacimiento(LocalDate.of(2017, 3, 15))
+                .genero(Genero.Femenino)
+                .direccion("Av. Los Padres 456")
+                .departamento("Lima")
+                .provincia("Lima")
+                .distrito("Miraflores")
+                .tieneDiscapacidad(false)
+                .estado(true)
+                .build();
+            alumnoRepository.save(alumno);
+
+            // ============= CREAR MATRÍCULA DE PRUEBA =============
+            
+            Matricula matricula = Matricula.builder()
+                .alumno(alumno)
+                .grado(primero)
+                .anoEscolar(Year.now())
+                .fechaMatricula(LocalDate.now())
+                .tipoMatricula(TipoMatricula.Nueva)
+                .estado(EstadoMatricula.Completada)
+                .usuarioMatricula(userRepository.findByUsername("Alonso").orElse(null))
+                .observaciones("Matrícula de prueba")
+                .build();
+            matriculaRepository.save(matricula);
+
+            // ============= CREAR FECHAS DE PAGO DE PRUEBA =============
+            
+            crearFechasPagoPrueba(matricula);
+
+            return ResponseEntity.ok("Datos de prueba creados exitosamente (3 grados, 6 cursos, 18 asociaciones grado-curso, 1 docente, 2 aulas, 1 usuario apoderado, 1 apoderado, 1 alumno, 1 matrícula con 10 cuotas de S/ 200.00)");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    private void crearFechasPagoPrueba(Matricula matricula) {
+        // Crear 10 cuotas mensuales (marzo a diciembre) con monto de S/ 200.00
+        BigDecimal montoCuota = new BigDecimal("200.00");
+        
+        for (int mes = 3; mes <= 12; mes++) {
+            FechaPago fechaPago = FechaPago.builder()
+                .matricula(matricula)
+                .descripcion("Cuota " + mes + "/" + matricula.getAnoEscolar())
+                .fechaVencimiento(LocalDate.of(matricula.getAnoEscolar().getValue(), mes, 15))
+                .monto(montoCuota)
+                .pagado(false)
+                .build();
+            
+            fechaPagoRepository.save(fechaPago);
         }
     }
 

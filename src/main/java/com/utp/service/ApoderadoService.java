@@ -17,6 +17,9 @@ public interface ApoderadoService {
     // Obtener todas las fechas de pago
     List<FechaPagoResponse> obtenerTodasLasFechasPago(Integer userId);
     
+    // Obtener fechas de pago pagadas
+    List<FechaPagoResponse> obtenerFechasPagoPagadas(Integer userId);
+    
     // Obtener horarios de los alumnos
     List<HorarioResponse> obtenerHorariosAlumnos(Integer userId);
 }

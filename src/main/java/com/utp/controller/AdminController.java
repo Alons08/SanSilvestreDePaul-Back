@@ -57,18 +57,7 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/apoderados/{id}")
-    public ResponseEntity<String> eliminarApoderado(@PathVariable Long id) {
-        try {
-            if (!apoderadoRepository.existsById(id)) {
-                return ResponseEntity.notFound().build();
-            }
-            apoderadoRepository.deleteById(id);
-            return ResponseEntity.ok("Apoderado eliminado exitosamente");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
-    }
+
 
     // ============= DOCENTES =============
     
@@ -101,18 +90,7 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/docentes/{id}")
-    public ResponseEntity<String> eliminarDocente(@PathVariable Long id) {
-        try {
-            if (!docenteRepository.existsById(id)) {
-                return ResponseEntity.notFound().build();
-            }
-            docenteRepository.deleteById(id);
-            return ResponseEntity.ok("Docente eliminado exitosamente");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
-    }
+
 
     // ============= ALUMNOS =============
     
@@ -147,18 +125,7 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/alumnos/{id}")
-    public ResponseEntity<String> eliminarAlumno(@PathVariable Long id) {
-        try {
-            if (!alumnoRepository.existsById(id)) {
-                return ResponseEntity.notFound().build();
-            }
-            alumnoRepository.deleteById(id);
-            return ResponseEntity.ok("Alumno eliminado exitosamente");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
-    }
+
 
     // ============= GRADOS =============
     

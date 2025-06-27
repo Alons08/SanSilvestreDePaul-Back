@@ -42,6 +42,10 @@ public class User implements UserDetails {
     @Column(nullable = false)
     Role role;
 
+    @Builder.Default
+    @Column(nullable = false)
+    Boolean estado = true;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Apoderado apoderado;
     // Relación opcional (para usuarios APODERADO si es obligatorio)
@@ -68,7 +72,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.estado;
     }
 
 }

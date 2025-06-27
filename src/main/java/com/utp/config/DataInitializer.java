@@ -31,6 +31,7 @@ public class DataInitializer implements CommandLineRunner {
                     .username("Alonso")
                     .password(passwordEncoder.encode("alonso123"))
                     .role(Role.Administrador)
+                    .estado(true)
                     .build();
                 userRepository.save(admin);
                 log.info("Usuario administrador creado exitosamente: {}", admin.getUsername());
@@ -45,6 +46,7 @@ public class DataInitializer implements CommandLineRunner {
                     .username("Jose")
                     .password(passwordEncoder.encode("jose123"))
                     .role(Role.Secretaria)
+                    .estado(true)
                     .build();
                 userRepository.save(secretaria);
                 log.info("Usuario secretaria creado exitosamente: {}", secretaria.getUsername());

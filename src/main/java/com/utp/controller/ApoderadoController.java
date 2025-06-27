@@ -56,6 +56,17 @@ public class ApoderadoController {
         }
     }
 
+    @GetMapping("/fechas-pago/pagadas")
+    public ResponseEntity<List<FechaPagoResponse>> obtenerFechasPagoPagadas() {
+        try {
+            Integer userId = obtenerUserIdAutenticado();
+            List<FechaPagoResponse> response = apoderadoService.obtenerFechasPagoPagadas(userId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/horarios")
     public ResponseEntity<List<HorarioResponse>> obtenerHorarios() {
         try {

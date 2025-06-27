@@ -59,6 +59,15 @@ public class ApoderadoServiceImpl implements ApoderadoService {
     }
 
     @Override
+    public List<FechaPagoResponse> obtenerFechasPagoPagadas(Integer userId) {
+        List<FechaPago> fechasPago = fechaPagoRepository.findPagadosByApoderadoUserId(userId);
+        
+        return fechasPago.stream()
+            .map(this::convertirAFechaPagoResponse)
+            .collect(Collectors.toList());
+    }
+
+    @Override
     public List<HorarioResponse> obtenerHorariosAlumnos(Integer userId) {
         List<Aula> aulas = aulaRepository.findAulasByApoderadoUserId(userId);
         

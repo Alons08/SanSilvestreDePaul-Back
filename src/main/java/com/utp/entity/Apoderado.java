@@ -62,6 +62,10 @@ public class Apoderado {
     private String lugarTrabajo;
     private String cargo;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean estado = true;
+
     @OneToMany(mappedBy = "apoderado")
     private List<Alumno> alumnos;
 }

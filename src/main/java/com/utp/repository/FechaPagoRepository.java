@@ -26,4 +26,13 @@ public interface FechaPagoRepository extends JpaRepository<FechaPago, Long> {
     
     @Query("SELECT fp FROM FechaPago fp WHERE fp.matricula.alumno.apoderado.user.id = :userId AND fp.pagado = false")
     List<FechaPago> findPendientesByApoderadoUserId(@Param("userId") Integer userId);
+    
+    @Query("SELECT fp FROM FechaPago fp WHERE fp.matricula.alumno.apoderado.user.id = :userId AND fp.pagado = true")
+    List<FechaPago> findPagadosByApoderadoUserId(@Param("userId") Integer userId);
+    
+    @Query("SELECT fp FROM FechaPago fp WHERE fp.matricula.id = :matriculaId AND fp.pagado = :pagado")
+    List<FechaPago> findByMatriculaIdAndPagado(@Param("matriculaId") Long matriculaId, @Param("pagado") Boolean pagado);
+    
+    @Query("SELECT fp FROM FechaPago fp WHERE fp.fechaVencimiento BETWEEN :fechaInicio AND :fechaFin")
+    List<FechaPago> findByFechaVencimientoBetween(@Param("fechaInicio") LocalDate fechaInicio, @Param("fechaFin") LocalDate fechaFin);
 }

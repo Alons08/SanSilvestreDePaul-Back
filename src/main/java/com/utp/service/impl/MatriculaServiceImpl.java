@@ -54,6 +54,11 @@ public class MatriculaServiceImpl implements MatriculaService {
         Alumno alumno = alumnoRepository.findById(request.getAlumnoId())
             .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
         
+        // Verificar que el alumno tenga un apoderado activo
+        if (alumno.getApoderado() == null || !alumno.getApoderado().getEstado()) {
+            throw new RuntimeException("El alumno no tiene un apoderado activo asignado");
+        }
+        
         if (!alumno.getApoderado().getUser().getId().equals(userId)) {
             throw new RuntimeException("No puede matricular a un alumno que no está a su cargo");
         }
@@ -99,7 +104,7 @@ public class MatriculaServiceImpl implements MatriculaService {
 
     private void crearFechasPagoAutomaticas(Matricula matricula) {
         // Crear 10 cuotas mensuales (marzo a diciembre)
-        BigDecimal montoCuota = new BigDecimal("150.00"); // Monto ejemplo
+        BigDecimal montoCuota = new BigDecimal("200.00"); // Monto actualizado a S/ 200.00
         
         for (int mes = 3; mes <= 12; mes++) {
             FechaPago fechaPago = FechaPago.builder()

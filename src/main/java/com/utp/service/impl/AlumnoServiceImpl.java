@@ -19,7 +19,6 @@ public class AlumnoServiceImpl implements AlumnoService {
 
     private final AlumnoRepository alumnoRepository;
     private final ApoderadoRepository apoderadoRepository;
-    private final MatriculaRepository matriculaRepository;
 
     @Override
     public AlumnoInfoResponse crearAlumno(AlumnoRequest request) {
@@ -105,23 +104,7 @@ public class AlumnoServiceImpl implements AlumnoService {
         return convertirAAlumnoInfoResponse(alumno);
     }
 
-    @Override
-    public void eliminarAlumno(Long id) {
-        Alumno alumno = alumnoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
-        
-        // Verificar que no tenga matrículas activas
-        List<Matricula> matriculas = matriculaRepository.findByAlumnoId(id);
-        boolean tieneMatriculasActivas = matriculas.stream()
-            .anyMatch(m -> m.getEstado() == EstadoMatricula.Completada || m.getEstado() == EstadoMatricula.Pendiente);
-        
-        if (tieneMatriculasActivas) {
-            throw new RuntimeException("No se puede eliminar un alumno con matrículas activas");
-        }
 
-        alumno.setEstado(false);
-        alumnoRepository.save(alumno);
-    }
 
     @Override
     @Transactional(readOnly = true)

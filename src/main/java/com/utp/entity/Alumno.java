@@ -26,9 +26,8 @@ public class Alumno {
     @JoinColumn(name = "documento_identidad_id", nullable = false)
     private DocumentoIdentidad documentoIdentidad;
 
-    @NotNull(message = "El apoderado no puede ser nulo")
     @ManyToOne
-    @JoinColumn(name = "apoderado_id", nullable = false)
+    @JoinColumn(name = "apoderado_id")
     private Apoderado apoderado;
 
     @NotBlank(message = "El nombre no puede estar vacío")
