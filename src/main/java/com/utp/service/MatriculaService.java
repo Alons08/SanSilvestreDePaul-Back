@@ -2,9 +2,7 @@ package com.utp.service;
 
 import com.utp.agregates.request.MatriculaRequest;
 import com.utp.agregates.response.MatriculaResponse;
-import com.utp.entity.Matricula;
 import com.utp.entity.EstadoMatricula;
-import com.utp.entity.TipoMatricula;
 
 import java.time.Year;
 import java.util.List;

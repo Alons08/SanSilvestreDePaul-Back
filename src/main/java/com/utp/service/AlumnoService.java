@@ -2,7 +2,6 @@ package com.utp.service;
 
 import com.utp.agregates.request.AlumnoRequest;
 import com.utp.agregates.response.AlumnoInfoResponse;
-import com.utp.entity.Alumno;
 import com.utp.entity.FechaPago;
 
 import java.util.List;
