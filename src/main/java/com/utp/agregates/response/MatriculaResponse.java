@@ -24,4 +24,6 @@ public class MatriculaResponse {
     private String observaciones;
     private String usuarioMatricula;
     private List<FechaPagoResponse> fechasPago;
+    private List<CursoAlumnoResponse> cursos;
+    private HorarioResponse horario;
 }

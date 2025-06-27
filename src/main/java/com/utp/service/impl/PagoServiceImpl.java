@@ -30,7 +30,14 @@ public class PagoServiceImpl implements PagoService {
         // Actualizar campos de pago
         fechaPago.setPagado(true);
         fechaPago.setFechaPago(request.getFechaPago() != null ? request.getFechaPago() : LocalDate.now());
-        fechaPago.setNumeroRecibo(request.getNumeroRecibo());
+        
+        // Generar número de recibo automáticamente si no se proporciona
+        String numeroRecibo = request.getNumeroRecibo();
+        if (numeroRecibo == null || numeroRecibo.trim().isEmpty()) {
+            numeroRecibo = generarNumeroReciboAutomatico();
+        }
+        fechaPago.setNumeroRecibo(numeroRecibo);
+        
         fechaPago.setObservaciones(request.getObservaciones());
         
         return fechaPagoRepository.save(fechaPago);
@@ -60,5 +67,25 @@ public class PagoServiceImpl implements PagoService {
     public FechaPago obtenerFechaPagoPorId(Long fechaPagoId) {
         return fechaPagoRepository.findById(fechaPagoId)
             .orElseThrow(() -> new RuntimeException("Fecha de pago no encontrada"));
+    }
+    
+    /**
+     * Genera un número de recibo automáticamente en formato: REC-YYYY-NNNNNN
+     * @return Número de recibo generado
+     */
+    private String generarNumeroReciboAutomatico() {
+        String año = String.valueOf(LocalDate.now().getYear());
+        
+        // Contar cuántos pagos se han realizado este año para generar secuencial
+        long totalPagosEsteAño = fechaPagoRepository.findAll().stream()
+            .filter(fp -> fp.getPagado() && fp.getFechaPago() != null)
+            .filter(fp -> fp.getFechaPago().getYear() == LocalDate.now().getYear())
+            .count();
+        
+        // Incrementar para el siguiente número secuencial
+        long siguienteSecuencial = totalPagosEsteAño + 1;
+        
+        // Formato: REC-2025-000001
+        return String.format("REC-%s-%06d", año, siguienteSecuencial);
     }
 }

@@ -21,6 +21,7 @@ public class ApoderadoServiceImpl implements ApoderadoService {
     private final FechaPagoRepository fechaPagoRepository;
     private final AulaRepository aulaRepository;
     private final MatriculaRepository matriculaRepository;
+    private final GradoCursoRepository gradoCursoRepository;
 
     @Override
     public ApoderadoDashboardResponse obtenerDashboardApoderado(Integer userId) {
@@ -76,6 +77,39 @@ public class ApoderadoServiceImpl implements ApoderadoService {
             .collect(Collectors.toList());
     }
 
+    @Override
+    public List<CursoAlumnoResponse> obtenerCursosHijos(Integer userId) {
+        List<Alumno> alumnos = alumnoRepository.findByApoderadoUserId(userId);
+        
+        return alumnos.stream()
+            .flatMap(alumno -> {
+                // Obtener la matrícula más reciente del alumno
+                List<Matricula> matriculas = matriculaRepository.findByAlumnoId(alumno.getId());
+                if (matriculas.isEmpty()) {
+                    return List.<CursoAlumnoResponse>of().stream();
+                }
+                
+                // Tomar la matrícula más reciente
+                Matricula matriculaActual = matriculas.get(matriculas.size() - 1);
+                
+                // Obtener los cursos del grado actual
+                List<GradoCurso> gradoCursos = gradoCursoRepository.findByGradoIdWithDetails(matriculaActual.getGrado().getId());
+                
+                return gradoCursos.stream()
+                    .map(gradoCurso -> CursoAlumnoResponse.builder()
+                        .id(gradoCurso.getId())
+                        .nombreCurso(gradoCurso.getCurso().getNombre())
+                        .descripcionCurso(gradoCurso.getCurso().getDescripcion())
+                        .horasSemanales(gradoCurso.getHorasSemanales())
+                        .nombreGrado(gradoCurso.getGrado().getNombreGrado())
+                        .nivelEducativo(gradoCurso.getGrado().getNivel().toString())
+                        .nombreAlumno(alumno.getNombre())
+                        .apellidoAlumno(alumno.getApellido())
+                        .build());
+            })
+            .collect(Collectors.toList());
+    }
+
     private AlumnoInfoResponse convertirAAlumnoInfoResponse(Alumno alumno) {
         List<Matricula> matriculas = matriculaRepository.findByAlumnoId(alumno.getId());
         
@@ -109,6 +143,25 @@ public class ApoderadoServiceImpl implements ApoderadoService {
                 .map(this::convertirAFechaPagoResponse)
                 .collect(Collectors.toList()) : List.of();
 
+        // Obtener cursos del grado
+        List<GradoCurso> gradoCursos = gradoCursoRepository.findByGradoIdWithDetails(matricula.getGrado().getId());
+        List<CursoAlumnoResponse> cursos = gradoCursos.stream()
+            .map(gradoCurso -> CursoAlumnoResponse.builder()
+                .id(gradoCurso.getId())
+                .nombreCurso(gradoCurso.getCurso().getNombre())
+                .descripcionCurso(gradoCurso.getCurso().getDescripcion())
+                .horasSemanales(gradoCurso.getHorasSemanales())
+                .nombreGrado(gradoCurso.getGrado().getNombreGrado())
+                .nivelEducativo(gradoCurso.getGrado().getNivel().toString())
+                .nombreAlumno(matricula.getAlumno().getNombre())
+                .apellidoAlumno(matricula.getAlumno().getApellido())
+                .build())
+            .collect(Collectors.toList());
+
+        // Obtener horario del aula del grado (solo en el contexto del apoderado usaremos versión simple)
+        HorarioResponse horario = null;
+        // Para el contexto de apoderado, mantenemos simple sin cargar horario completo
+
         return MatriculaResponse.builder()
             .id(matricula.getId())
             .nombreAlumno(matricula.getAlumno().getNombre())
@@ -124,6 +177,8 @@ public class ApoderadoServiceImpl implements ApoderadoService {
             .usuarioMatricula(matricula.getUsuarioMatricula() != null ? 
                 matricula.getUsuarioMatricula().getUsername() : null)
             .fechasPago(fechasPago)
+            .cursos(cursos)
+            .horario(horario)
             .build();
     }
 

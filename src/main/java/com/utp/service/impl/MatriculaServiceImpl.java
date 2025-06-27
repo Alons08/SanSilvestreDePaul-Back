@@ -3,6 +3,8 @@ package com.utp.service.impl;
 import com.utp.agregates.request.MatriculaRequest;
 import com.utp.agregates.response.MatriculaResponse;
 import com.utp.agregates.response.FechaPagoResponse;
+import com.utp.agregates.response.CursoAlumnoResponse;
+import com.utp.agregates.response.HorarioResponse;
 import com.utp.entity.*;
 import com.utp.repository.*;
 import com.utp.service.MatriculaService;
@@ -26,6 +28,8 @@ public class MatriculaServiceImpl implements MatriculaService {
     private final GradoRepository gradoRepository;
     private final UserRepository userRepository;
     private final FechaPagoRepository fechaPagoRepository;
+    private final GradoCursoRepository gradoCursoRepository;
+    private final AulaRepository aulaRepository;
 
     @Override
     public MatriculaResponse crearMatriculaNueva(MatriculaRequest request, Integer userId) {
@@ -106,16 +110,18 @@ public class MatriculaServiceImpl implements MatriculaService {
         // Crear 10 cuotas mensuales (marzo a diciembre)
         BigDecimal montoCuota = new BigDecimal("200.00"); // Monto actualizado a S/ 200.00
         
+        int numeroCuota = 1;
         for (int mes = 3; mes <= 12; mes++) {
             FechaPago fechaPago = FechaPago.builder()
                 .matricula(matricula)
-                .descripcion("Cuota " + mes + "/" + matricula.getAnoEscolar())
+                .descripcion("Cuota " + numeroCuota + "/" + matricula.getAnoEscolar())
                 .fechaVencimiento(LocalDate.of(matricula.getAnoEscolar().getValue(), mes, 15))
                 .monto(montoCuota)
                 .pagado(false)
                 .build();
             
             fechaPagoRepository.save(fechaPago);
+            numeroCuota++;
         }
     }
 
@@ -220,6 +226,38 @@ public class MatriculaServiceImpl implements MatriculaService {
             .map(this::convertirAFechaPagoResponse)
             .collect(Collectors.toList());
 
+        // Obtener cursos del grado
+        List<GradoCurso> gradoCursos = gradoCursoRepository.findByGradoIdWithDetails(matricula.getGrado().getId());
+        List<CursoAlumnoResponse> cursos = gradoCursos.stream()
+            .map(gradoCurso -> CursoAlumnoResponse.builder()
+                .id(gradoCurso.getId())
+                .nombreCurso(gradoCurso.getCurso().getNombre())
+                .descripcionCurso(gradoCurso.getCurso().getDescripcion())
+                .horasSemanales(gradoCurso.getHorasSemanales())
+                .nombreGrado(gradoCurso.getGrado().getNombreGrado())
+                .nivelEducativo(gradoCurso.getGrado().getNivel().toString())
+                .nombreAlumno(matricula.getAlumno().getNombre())
+                .apellidoAlumno(matricula.getAlumno().getApellido())
+                .build())
+            .collect(Collectors.toList());
+
+        // Obtener horario del aula del grado
+        HorarioResponse horario = null;
+        List<Aula> aulas = aulaRepository.findByGradoId(matricula.getGrado().getId());
+        if (!aulas.isEmpty()) {
+            Aula aula = aulas.get(0); // Tomar la primera aula del grado
+            horario = HorarioResponse.builder()
+                .aulaId(aula.getId())
+                .nombreAula(aula.getNombre())
+                .nombreGrado(aula.getGrado().getNombreGrado())
+                .nombreDocente(aula.getDocente().getNombre())
+                .apellidoDocente(aula.getDocente().getApellido())
+                .horarioInicio(aula.getHorarioInicio())
+                .horarioFin(aula.getHorarioFin())
+                .capacidad(aula.getCapacidad())
+                .build();
+        }
+
         return MatriculaResponse.builder()
             .id(matricula.getId())
             .nombreAlumno(matricula.getAlumno().getNombre())
@@ -234,6 +272,8 @@ public class MatriculaServiceImpl implements MatriculaService {
             .observaciones(matricula.getObservaciones())
             .usuarioMatricula(matricula.getUsuarioMatricula().getUsername())
             .fechasPago(fechasPago)
+            .cursos(cursos)
+            .horario(horario)
             .build();
     }
 

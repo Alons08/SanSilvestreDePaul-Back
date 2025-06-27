@@ -14,9 +14,13 @@ import java.util.Optional;
 public interface GradoCursoRepository extends JpaRepository<GradoCurso, Long> {
     List<GradoCurso> findByGrado(Grado grado);
     List<GradoCurso> findByCurso(Curso curso);
+    List<GradoCurso> findByGradoId(Long gradoId);
     Optional<GradoCurso> findByGradoAndCurso(Grado grado, Curso curso);
     boolean existsByGradoAndCurso(Grado grado, Curso curso);
     
     @Query("SELECT gc FROM GradoCurso gc JOIN FETCH gc.grado JOIN FETCH gc.curso")
     List<GradoCurso> findAllWithDetails();
+    
+    @Query("SELECT gc FROM GradoCurso gc JOIN FETCH gc.grado JOIN FETCH gc.curso WHERE gc.grado.id = :gradoId")
+    List<GradoCurso> findByGradoIdWithDetails(Long gradoId);
 }

@@ -3,6 +3,7 @@ package com.utp.controller;
 import com.utp.agregates.response.ApoderadoDashboardResponse;
 import com.utp.agregates.response.FechaPagoResponse;
 import com.utp.agregates.response.HorarioResponse;
+import com.utp.agregates.response.CursoAlumnoResponse;
 import com.utp.service.ApoderadoService;
 import com.utp.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +73,17 @@ public class ApoderadoController {
         try {
             Integer userId = obtenerUserIdAutenticado();
             List<HorarioResponse> response = apoderadoService.obtenerHorariosAlumnos(userId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/cursos")
+    public ResponseEntity<List<CursoAlumnoResponse>> obtenerCursosHijos() {
+        try {
+            Integer userId = obtenerUserIdAutenticado();
+            List<CursoAlumnoResponse> response = apoderadoService.obtenerCursosHijos(userId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

@@ -19,6 +19,7 @@ public class AlumnoServiceImpl implements AlumnoService {
 
     private final AlumnoRepository alumnoRepository;
     private final ApoderadoRepository apoderadoRepository;
+    private final FechaPagoRepository fechaPagoRepository;
 
     @Override
     public AlumnoInfoResponse crearAlumno(AlumnoRequest request) {
@@ -113,6 +114,48 @@ public class AlumnoServiceImpl implements AlumnoService {
         return alumnos.stream()
             .map(this::convertirAAlumnoInfoResponse)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AlumnoInfoResponse> buscarAlumnosPorNombreCompleto(String nombre, String apellido) {
+        List<Alumno> alumnos = alumnoRepository.findByNombreAndApellidoContainingIgnoreCase(nombre, apellido);
+        return alumnos.stream()
+            .map(this::convertirAAlumnoInfoResponse)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FechaPago> obtenerTodasLasCuotasPorAlumno(Long alumnoId) {
+        // Verificar que el alumno existe
+        alumnoRepository.findById(alumnoId)
+            .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
+        
+        // Obtener todas las cuotas del alumno usando consulta optimizada
+        return fechaPagoRepository.findByAlumnoId(alumnoId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FechaPago> obtenerCuotasPendientesPorAlumno(Long alumnoId) {
+        // Verificar que el alumno existe
+        alumnoRepository.findById(alumnoId)
+            .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
+        
+        // Obtener solo las cuotas pendientes del alumno usando consulta optimizada
+        return fechaPagoRepository.findPendientesByAlumnoId(alumnoId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FechaPago> buscarCuotasPorDescripcion(Long alumnoId, String descripcion) {
+        // Verificar que el alumno existe
+        alumnoRepository.findById(alumnoId)
+            .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
+        
+        // Buscar cuotas por descripción usando consulta optimizada
+        return fechaPagoRepository.findByAlumnoIdAndDescripcionContainingIgnoreCase(alumnoId, descripcion);
     }
 
     private AlumnoInfoResponse convertirAAlumnoInfoResponse(Alumno alumno) {

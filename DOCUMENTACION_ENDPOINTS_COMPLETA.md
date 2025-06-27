@@ -562,7 +562,7 @@ Content-Type: application/json
     "tipoMatricula": "Nueva",
     "observaciones": "Matrícula nueva para el año 2025"
 }
-```
+
 
 ### CREAR MATRÍCULA RATIFICACIÓN
 ```http
@@ -641,9 +641,13 @@ Authorization: Bearer tu_jwt_token_admin_o_secretaria
 Content-Type: application/json
 
 {
-    "numeroRecibo": "REC-001-2025",
+    "numeroRecibo": "REC-001-2025",  // ⚠️ OPCIONAL: Si no se envía, se genera automáticamente
     "observaciones": "Pago realizado en efectivo"
 }
+
+# ✅ NOTA: El numeroRecibo se genera automáticamente en formato REC-YYYY-NNNNNN
+# Si no envías numeroRecibo, el sistema genera: REC-2025-000001, REC-2025-000002, etc.
+# Si envías numeroRecibo, usará el valor que proporciones (ej: recibo físico)
 ```
 
 ### REVERTIR PAGO DE CUOTA
@@ -688,6 +692,76 @@ Authorization: Bearer tu_jwt_token_admin_o_secretaria
 
 ---
 
+## 🔍 8.1. CONSULTAS AVANZADA DE ALUMNOS Y CUOTAS (`/api/admin/`) - **NUEVO**
+
+### BUSCAR ALUMNOS - **NUEVO**
+```http
+GET http://localhost:8025/api/admin/alumnos/buscar?nombre=Juan&apellido=Perez
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+
+# Parámetros opcionales:
+# - nombre: Busca por nombre o apellido (cualquiera de los dos)
+# - apellido: Busca por apellido específico
+# - Si no se envían parámetros, devuelve todos los alumnos
+
+# Ejemplos:
+# /api/admin/alumnos/buscar?nombre=Juan
+# /api/admin/alumnos/buscar?nombre=Juan&apellido=Perez
+# /api/admin/alumnos/buscar
+```
+
+### OBTENER CUOTAS DE UN ALUMNO - **NUEVO**
+```http
+GET http://localhost:8025/api/admin/alumnos/1/cuotas?tipo=pendientes
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+
+# Parámetros:
+# - tipo: "todas" (por defecto) o "pendientes"
+
+# Ejemplos:
+# /api/admin/alumnos/1/cuotas (todas las cuotas)
+# /api/admin/alumnos/1/cuotas?tipo=pendientes (solo pendientes)
+```
+
+### BUSCAR CUOTAS POR DESCRIPCIÓN - **NUEVO**
+```http
+GET http://localhost:8025/api/admin/alumnos/1/cuotas/buscar?descripcion=Marzo
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+
+# Busca cuotas que contengan el texto en la descripción
+# Ejemplo: "Marzo" encontrará "Mensualidad Marzo 2025"
+```
+
+### RESUMEN DE PAGOS DEL ALUMNO - **NUEVO**
+```http
+GET http://localhost:8025/api/admin/alumnos/1/resumen-pagos
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+
+# Respuesta incluye:
+# - Total de cuotas
+# - Cuotas pagadas
+# - Cuotas pendientes
+# - Las próximas 3 cuotas pendientes
+```
+
+### BÚSQUEDA GLOBAL ALUMNO + CUOTAS - **NUEVO**
+```http
+GET http://localhost:8025/api/admin/busqueda-global?termino=Juan
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+
+# Búsqueda combinada que devuelve:
+# - Alumnos que coincidan con el término
+# - Resumen de cuotas pendientes para cada alumno encontrado
+# - Ideal para búsquedas rápidas desde un solo endpoint
+```
+
+---
+
 ## 👨‍👩‍👧‍👦 9. PORTAL APODERADOS (`/api/apoderado/`)
 
 ### DASHBOARD DEL APODERADO
@@ -723,6 +797,19 @@ Authorization: Bearer tu_jwt_token_apoderado
 GET http://localhost:8025/api/apoderado/horarios
 Authorization: Bearer tu_jwt_token_apoderado
 👤 ROL: Apoderado únicamente
+```
+
+### VER CURSOS DE MIS HIJOS - **NUEVO**
+```http
+GET http://localhost:8025/api/apoderado/cursos
+Authorization: Bearer tu_jwt_token_apoderado
+👤 ROL: Apoderado únicamente
+
+# Respuesta incluye:
+# - Lista de todos los cursos de cada hijo
+# - Información del curso (nombre, descripción, horas semanales)
+# - Información del grado y nivel educativo
+# - Nombre del alumno para identificar a cuál hijo pertenece cada curso
 ```
 
 ### VER MIS MATRÍCULAS
@@ -772,7 +859,7 @@ POST http://localhost:8025/auth/login
 Content-Type: application/json
 
 {
-    "username": "apoderado_prueba",
+    "username": "apoderado_demo",
     "password": "123456"
 }
 ```
@@ -852,7 +939,8 @@ Content-Type: application/json
 ├── 📁 05-Gestion-Estados/
 ├── 📁 06-Matriculas/
 ├── 📁 07-Pagos/
-└── 📁 08-Portal-Apoderados/
+├── 📁 08-Gestion-Avanzada-Alumnos-Cuotas/ 🆕
+└── 📁 09-Portal-Apoderados/ ⭐ (Incluye nuevo endpoint de cursos)
 ```
 
 
@@ -1015,8 +1103,12 @@ Content-Type: application/json
 
 **✅ Resultado:** Al crear la matrícula, automáticamente se generan:
 - 10 cuotas mensuales (marzo a diciembre)
+- Numeración de cuotas del 1 al 10 (Cuota 1/2025, Cuota 2/2025, etc.)
+- Fechas de vencimiento correspondientes a cada mes (marzo a diciembre)
 - Cada cuota con monto de S/ 200.00
 - Estado inicial: no pagado
+- **Lista completa de cursos** que llevará el alumno con horas semanales
+- **Información del horario** (aula, docente, horarios de inicio y fin)
 
 ---
 
@@ -1106,4 +1198,5 @@ Este endpoint crea automáticamente:
 - 1 docente y 2 aulas
 - 1 usuario apoderado completo
 - 1 alumno matriculado
-- 1 matrícula con 10 cuotas de S/ 200.00
+- 1 matrícula con 10 cuotas numeradas del 1 al 10 de S/ 200.00
+- **Respuesta completa** con cursos y horario del alumno

@@ -459,8 +459,8 @@ public class SetupController {
             
             // Crear usuario para apoderado
             User userApoderado = User.builder()
-                .username("apoderado_prueba")
-                .password("$2a$10$7XgvQjK1OqZ8QxqQZ8QxqO7XgvQjK1OqZ8QxqQZ8QxqO7XgvQjK1O") // password: "123456"
+                .username("apoderado_demo")
+                .password("$2a$10$2WZj9Y59IqS2qa4rEN2qIOuDGgKZYRpSIQtXuEsba8yVIEPn0U3Ha") // password: "apoderado1"
                 .role(Role.Apoderado)
                 .estado(true)
                 .build();
@@ -469,24 +469,24 @@ public class SetupController {
             // Crear documento para apoderado
             DocumentoIdentidad apoderadoDoc = DocumentoIdentidad.builder()
                 .tipoDocumento(TipoDocumento.DNI)
-                .numeroDocumento("87654321")
+                .numeroDocumento("98765432")
                 .build();
 
             // Crear apoderado
             Apoderado apoderado = Apoderado.builder()
                 .documentoIdentidad(apoderadoDoc)
                 .user(userApoderado)
-                .nombre("Carlos")
-                .apellido("Mendoza")
+                .nombre("Luis")
+                .apellido("Rodriguez")
                 .parentesco(Parentesco.Padre)
-                .direccion("Av. Los Padres 456")
+                .direccion("Av. Las Flores 789")
                 .departamento("Lima")
                 .provincia("Lima")
-                .distrito("Miraflores")
-                .telefono("998877665")
-                .email("carlos.mendoza@email.com")
-                .lugarTrabajo("Empresa ABC")
-                .cargo("Gerente")
+                .distrito("San Borja")
+                .telefono("987123456")
+                .email("alonso.lq08@gmail.com")
+                .lugarTrabajo("Empresa Demo")
+                .cargo("Ingeniero")
                 .build();
             apoderadoRepository.save(apoderado);
 
@@ -494,20 +494,20 @@ public class SetupController {
             
             DocumentoIdentidad alumnoDoc = DocumentoIdentidad.builder()
                 .tipoDocumento(TipoDocumento.DNI)
-                .numeroDocumento("11223344")
+                .numeroDocumento("55667788")
                 .build();
 
             Alumno alumno = Alumno.builder()
                 .documentoIdentidad(alumnoDoc)
                 .apoderado(apoderado)
-                .nombre("Ana")
-                .apellido("Mendoza")
-                .fechaNacimiento(LocalDate.of(2017, 3, 15))
+                .nombre("Sofia")
+                .apellido("Rodriguez")
+                .fechaNacimiento(LocalDate.of(2018, 5, 20))
                 .genero(Genero.Femenino)
-                .direccion("Av. Los Padres 456")
+                .direccion("Av. Las Flores 789")
                 .departamento("Lima")
                 .provincia("Lima")
-                .distrito("Miraflores")
+                .distrito("San Borja")
                 .tieneDiscapacidad(false)
                 .estado(true)
                 .build();
@@ -523,7 +523,7 @@ public class SetupController {
                 .tipoMatricula(TipoMatricula.Nueva)
                 .estado(EstadoMatricula.Completada)
                 .usuarioMatricula(userRepository.findByUsername("Alonso").orElse(null))
-                .observaciones("Matrícula de prueba")
+                .observaciones("Matrícula de prueba automática")
                 .build();
             matriculaRepository.save(matricula);
 
@@ -541,16 +541,18 @@ public class SetupController {
         // Crear 10 cuotas mensuales (marzo a diciembre) con monto de S/ 200.00
         BigDecimal montoCuota = new BigDecimal("200.00");
         
+        int numeroCuota = 1;
         for (int mes = 3; mes <= 12; mes++) {
             FechaPago fechaPago = FechaPago.builder()
                 .matricula(matricula)
-                .descripcion("Cuota " + mes + "/" + matricula.getAnoEscolar())
+                .descripcion("Cuota " + numeroCuota + "/" + matricula.getAnoEscolar())
                 .fechaVencimiento(LocalDate.of(matricula.getAnoEscolar().getValue(), mes, 15))
                 .monto(montoCuota)
                 .pagado(false)
                 .build();
             
             fechaPagoRepository.save(fechaPago);
+            numeroCuota++;
         }
     }
 

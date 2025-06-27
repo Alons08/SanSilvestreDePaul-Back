@@ -1,13 +1,21 @@
 package com.utp.controller;
 
 import com.utp.agregates.request.*;
+import com.utp.agregates.response.AlumnoInfoResponse;
 import com.utp.entity.*;
 import com.utp.repository.*;
+import com.utp.service.AlumnoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -22,6 +30,7 @@ public class AdminController {
     private final AulaRepository aulaRepository;
     private final CursoRepository cursoRepository;
     private final GradoCursoRepository gradoCursoRepository;
+    private final AlumnoService alumnoService;
 
     // ============= APODERADOS =============
     
@@ -278,6 +287,128 @@ public class AdminController {
             return ResponseEntity.ok("Asociación grado-curso eliminada exitosamente");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    // ============= NUEVOS ENDPOINTS PARA BÚSQUEDA DE ALUMNOS Y CUOTAS =============
+    
+    @GetMapping("/alumnos/buscar")
+    public ResponseEntity<?> buscarAlumnos(@RequestParam(required = false) String nombre, 
+                                         @RequestParam(required = false) String apellido) {
+        try {
+            List<AlumnoInfoResponse> alumnos;
+            
+            if (nombre != null && apellido != null) {
+                // Búsqueda por nombre y apellido específicos
+                alumnos = alumnoService.buscarAlumnosPorNombreCompleto(nombre, apellido);
+            } else if (nombre != null) {
+                // Búsqueda por nombre o apellido (cualquiera de los dos)
+                alumnos = alumnoService.buscarAlumnosPorNombre(nombre);
+            } else {
+                // Si no se proporcionan parámetros, devolver todos los alumnos
+                alumnos = alumnoService.listarTodosLosAlumnos();
+            }
+            
+            return ResponseEntity.ok(alumnos);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al buscar alumnos: " + e.getMessage());
+        }
+    }
+    
+    @GetMapping("/alumnos/{alumnoId}/cuotas")
+    public ResponseEntity<?> obtenerCuotasDelAlumno(@PathVariable Long alumnoId,
+                                                   @RequestParam(defaultValue = "todas") String tipo) {
+        try {
+            List<FechaPago> cuotas;
+            
+            if ("pendientes".equals(tipo)) {
+                cuotas = alumnoService.obtenerCuotasPendientesPorAlumno(alumnoId);
+            } else {
+                cuotas = alumnoService.obtenerTodasLasCuotasPorAlumno(alumnoId);
+            }
+            
+            return ResponseEntity.ok(cuotas);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al obtener cuotas: " + e.getMessage());
+        }
+    }
+    
+    @GetMapping("/alumnos/{alumnoId}/cuotas/buscar")
+    public ResponseEntity<?> buscarCuotaPorDescripcion(@PathVariable Long alumnoId,
+                                                      @RequestParam String descripcion) {
+        try {
+            // Usar el método optimizado del servicio
+            List<FechaPago> cuotasFiltradas = alumnoService.buscarCuotasPorDescripcion(alumnoId, descripcion);
+            
+            if (cuotasFiltradas.isEmpty()) {
+                return ResponseEntity.ok("No se encontraron cuotas con la descripción: " + descripcion);
+            }
+            
+            return ResponseEntity.ok(cuotasFiltradas);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al buscar cuota: " + e.getMessage());
+        }
+    }
+    
+    @GetMapping("/alumnos/{alumnoId}/resumen-pagos")
+    public ResponseEntity<?> obtenerResumenPagos(@PathVariable Long alumnoId) {
+        try {
+            List<FechaPago> todasLasCuotas = alumnoService.obtenerTodasLasCuotasPorAlumno(alumnoId);
+            List<FechaPago> cuotasPendientes = alumnoService.obtenerCuotasPendientesPorAlumno(alumnoId);
+            
+            long totalCuotas = todasLasCuotas.size();
+            long cuotasPagadas = totalCuotas - cuotasPendientes.size();
+            
+            // Crear un mapa con el resumen
+            var resumen = new java.util.HashMap<String, Object>();
+            resumen.put("alumnoId", alumnoId);
+            resumen.put("totalCuotas", totalCuotas);
+            resumen.put("cuotasPagadas", cuotasPagadas);
+            resumen.put("cuotasPendientes", cuotasPendientes.size());
+            resumen.put("proximasCuotasPendientes", cuotasPendientes.stream()
+                .limit(3) // Mostrar las próximas 3 cuotas pendientes
+                .collect(Collectors.toList()));
+            
+            return ResponseEntity.ok(resumen);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al obtener resumen de pagos: " + e.getMessage());
+        }
+    }
+    
+    @GetMapping("/busqueda-global")
+    public ResponseEntity<?> busquedaGlobalAlumnoYCuotas(@RequestParam String termino) {
+        try {
+            // Buscar alumnos que coincidan con el término
+            List<AlumnoInfoResponse> alumnos = alumnoService.buscarAlumnosPorNombre(termino);
+            
+            var resultado = new java.util.HashMap<String, Object>();
+            resultado.put("termino", termino);
+            resultado.put("alumnos", alumnos);
+            
+            // Si encontramos alumnos, también obtenemos un resumen de sus cuotas pendientes
+            if (!alumnos.isEmpty()) {
+                var resumenesPagos = new java.util.ArrayList<>();
+                
+                for (AlumnoInfoResponse alumno : alumnos) {
+                    List<FechaPago> cuotasPendientes = alumnoService.obtenerCuotasPendientesPorAlumno(alumno.getId());
+                    
+                    var resumenAlumno = new java.util.HashMap<String, Object>();
+                    resumenAlumno.put("alumnoId", alumno.getId());
+                    resumenAlumno.put("nombreCompleto", alumno.getNombre() + " " + alumno.getApellido());
+                    resumenAlumno.put("cuotasPendientes", cuotasPendientes.size());
+                    resumenAlumno.put("proximasCuotasPendientes", cuotasPendientes.stream()
+                        .limit(2) // Solo las próximas 2 cuotas pendientes
+                        .collect(Collectors.toList()));
+                    
+                    resumenesPagos.add(resumenAlumno);
+                }
+                
+                resultado.put("resumenesPagos", resumenesPagos);
+            }
+            
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error en búsqueda global: " + e.getMessage());
         }
     }
 }

@@ -32,4 +32,8 @@ public interface AlumnoRepository extends JpaRepository<Alumno, Long> {
     
     @Query("SELECT a FROM Alumno a WHERE a.apoderado IS NULL OR a.apoderado.estado = false")
     List<Alumno> findAlumnosSinApoderadoActivo();
+    
+    // NUEVAS MEJORAS
+    @Query("SELECT a FROM Alumno a WHERE LOWER(a.nombre) LIKE LOWER(CONCAT('%', :nombre, '%')) AND LOWER(a.apellido) LIKE LOWER(CONCAT('%', :apellido, '%'))")
+    List<Alumno> findByNombreAndApellidoContainingIgnoreCase(@Param("nombre") String nombre, @Param("apellido") String apellido);
 }
