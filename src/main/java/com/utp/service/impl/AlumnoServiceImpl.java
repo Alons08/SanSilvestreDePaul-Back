@@ -29,8 +29,8 @@ public class AlumnoServiceImpl implements AlumnoService {
 
         // Crear documento de identidad
         DocumentoIdentidad documento = DocumentoIdentidad.builder()
-            .tipoDocumento(request.getDocumentoIdentidad().getTipoDocumento())
-            .numeroDocumento(request.getDocumentoIdentidad().getNumeroDocumento())
+            .tipoDocumento(request.getTipoDocumento())
+            .numeroDocumento(request.getNumeroDocumento())
             .build();
 
         // Crear alumno
@@ -86,8 +86,8 @@ public class AlumnoServiceImpl implements AlumnoService {
             .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
 
         // Actualizar documento si cambió
-        alumno.getDocumentoIdentidad().setTipoDocumento(request.getDocumentoIdentidad().getTipoDocumento());
-        alumno.getDocumentoIdentidad().setNumeroDocumento(request.getDocumentoIdentidad().getNumeroDocumento());
+        alumno.getDocumentoIdentidad().setTipoDocumento(request.getTipoDocumento());
+        alumno.getDocumentoIdentidad().setNumeroDocumento(request.getNumeroDocumento());
 
         // Actualizar datos del alumno
         alumno.setNombre(request.getNombre());

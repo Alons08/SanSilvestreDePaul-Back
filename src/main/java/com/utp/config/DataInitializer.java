@@ -1,7 +1,7 @@
 package com.utp.config;
 
-import com.utp.entity.Role;
-import com.utp.entity.User;
+import com.utp.entity.*;
+import com.utp.repository.PersonalRepository;
 import com.utp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final PersonalRepository personalRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -27,14 +28,32 @@ public class DataInitializer implements CommandLineRunner {
             // Verificar si ya existe un usuario administrador
             boolean adminExists = userRepository.existsByRole(Role.Administrador);
             if (!adminExists) {
+                // Crear documento de identidad para administrador
+                DocumentoIdentidad docAdmin = DocumentoIdentidad.builder()
+                    .tipoDocumento(TipoDocumento.DNI)
+                    .numeroDocumento("70600740")
+                    .build();
+
                 User admin = User.builder()
                     .username("Alonso")
                     .password(passwordEncoder.encode("alonso123"))
                     .role(Role.Administrador)
                     .estado(true)
                     .build();
-                userRepository.save(admin);
-                log.info("Usuario administrador creado exitosamente: {}", admin.getUsername());
+                User savedAdmin = userRepository.save(admin);
+
+                // Crear registro de personal para administrador
+                Personal personalAdmin = Personal.builder()
+                    .nombre("Alonso Ariam")
+                    .apellido("Leandro Quispe")
+                    .email("alonso.lq08@gmail.com")
+                    .documentoIdentidad(docAdmin)
+                    .user(savedAdmin)
+                    .estado(true)
+                    .build();
+                personalRepository.save(personalAdmin);
+
+                log.info("Usuario administrador y personal creado exitosamente: {}", admin.getUsername());
             } else {
                 log.info("Usuario administrador ya existe, omitiendo creación");
             }
@@ -42,14 +61,32 @@ public class DataInitializer implements CommandLineRunner {
             // Verificar si ya existe un usuario secretaria
             boolean secretariaExists = userRepository.existsByRole(Role.Secretaria);
             if (!secretariaExists) {
+                // Crear documento de identidad para secretaria
+                DocumentoIdentidad docSecretaria = DocumentoIdentidad.builder()
+                    .tipoDocumento(TipoDocumento.DNI)
+                    .numeroDocumento("87654321")
+                    .build();
+
                 User secretaria = User.builder()
                     .username("Jose")
                     .password(passwordEncoder.encode("jose123"))
                     .role(Role.Secretaria)
                     .estado(true)
                     .build();
-                userRepository.save(secretaria);
-                log.info("Usuario secretaria creado exitosamente: {}", secretaria.getUsername());
+                User savedSecretaria = userRepository.save(secretaria);
+
+                // Crear registro de personal para secretaria
+                Personal personalSecretaria = Personal.builder()
+                    .nombre("Jose Alberto")
+                    .apellido("Hurtado Rivas")
+                    .email("programaciondevjose2004@gmail.com")
+                    .documentoIdentidad(docSecretaria)
+                    .user(savedSecretaria)
+                    .estado(true)
+                    .build();
+                personalRepository.save(personalSecretaria);
+
+                log.info("Usuario secretaria y personal creado exitosamente: {}", secretaria.getUsername());
             } else {
                 log.info("Usuario secretaria ya existe, omitiendo creación");
             }

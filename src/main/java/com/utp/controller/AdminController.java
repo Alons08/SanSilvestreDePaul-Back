@@ -50,11 +50,9 @@ public class AdminController {
             apoderado.setLugarTrabajo(request.getLugarTrabajo());
             apoderado.setCargo(request.getCargo());
 
-            // Actualizar documento si es necesario
-            if (request.getDocumentoIdentidad() != null) {
-                apoderado.getDocumentoIdentidad().setTipoDocumento(request.getDocumentoIdentidad().getTipoDocumento());
-                apoderado.getDocumentoIdentidad().setNumeroDocumento(request.getDocumentoIdentidad().getNumeroDocumento());
-            }
+            // Actualizar documento
+            apoderado.getDocumentoIdentidad().setTipoDocumento(request.getTipoDocumento());
+            apoderado.getDocumentoIdentidad().setNumeroDocumento(request.getNumeroDocumento());
 
             apoderadoRepository.save(apoderado);
             return ResponseEntity.ok("Apoderado actualizado exitosamente");
@@ -118,11 +116,9 @@ public class AdminController {
             alumno.setTieneDiscapacidad(request.getTieneDiscapacidad());
             alumno.setDiagnosticoMedico(request.getDiagnosticoMedico());
 
-            // Actualizar documento si es necesario
-            if (request.getDocumentoIdentidad() != null) {
-                alumno.getDocumentoIdentidad().setTipoDocumento(request.getDocumentoIdentidad().getTipoDocumento());
-                alumno.getDocumentoIdentidad().setNumeroDocumento(request.getDocumentoIdentidad().getNumeroDocumento());
-            }
+            // Actualizar documento
+            alumno.getDocumentoIdentidad().setTipoDocumento(request.getTipoDocumento());
+            alumno.getDocumentoIdentidad().setNumeroDocumento(request.getNumeroDocumento());
 
             alumnoRepository.save(alumno);
             return ResponseEntity.ok("Alumno actualizado exitosamente");

@@ -2,7 +2,6 @@ package com.utp.controller;
 
 import com.utp.agregates.request.ForgotPasswordRequest;
 import com.utp.agregates.request.LoginRequest;
-import com.utp.agregates.request.RegisterRequest;
 import com.utp.agregates.request.ResetPasswordRequest;
 import com.utp.agregates.response.AuthResponse;
 import com.utp.agregates.response.BaseResponse;
@@ -28,21 +27,15 @@ public class AuthController {
         response.setMessage("Login exitoso");
         return ResponseEntity.ok(response);
     }
-
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        AuthResponse response = authService.register(request);
-        response.setSuccess(true);
-        response.setMessage("Registro exitoso");
-        return ResponseEntity.ok(response);
-    }
     
     @PostMapping("/forgot-password")
     public ResponseEntity<BaseResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         try {
             passwordResetService.initiatePasswordReset(request.getEmail());
             return ResponseEntity.ok(BaseResponse.success(
-                "Si el email está registrado, recibirás las instrucciones para restablecer tu contraseña"));
+                "Se ha enviado un email con las instrucciones para restablecer tu contraseña"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(BaseResponse.error(e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(BaseResponse.error("Error al procesar la solicitud"));
         }

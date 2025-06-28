@@ -1,9 +1,11 @@
 package com.utp.service.impl;
 
 import com.utp.entity.Apoderado;
+import com.utp.entity.Personal;
 import com.utp.entity.PasswordResetToken;
 import com.utp.entity.User;
 import com.utp.repository.ApoderadoRepository;
+import com.utp.repository.PersonalRepository;
 import com.utp.repository.PasswordResetTokenRepository;
 import com.utp.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -22,6 +24,7 @@ import java.util.Optional;
 public class PasswordResetService {
     
     private final ApoderadoRepository apoderadoRepository;
+    private final PersonalRepository personalRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
@@ -32,17 +35,30 @@ public class PasswordResetService {
     
     @Transactional
     public void initiatePasswordReset(String email) {
-        // Buscar el apoderado por email
-        Optional<Apoderado> apoderadoOpt = apoderadoRepository.findByEmail(email);
+        User user = null;
+        String userName = null;
         
-        if (apoderadoOpt.isEmpty()) {
-            // Por seguridad, no revelamos si el email existe o no
-            log.warn("Intento de recuperación de contraseña para email no registrado: {}", email);
-            return;
+        // Buscar primero en apoderados
+        Optional<Apoderado> apoderadoOpt = apoderadoRepository.findByEmail(email);
+        if (apoderadoOpt.isPresent()) {
+            Apoderado apoderado = apoderadoOpt.get();
+            user = apoderado.getUser();
+            userName = apoderado.getNombre() + " " + apoderado.getApellido();
+        } else {
+            // Si no se encuentra en apoderados, buscar en personal
+            Optional<Personal> personalOpt = personalRepository.findByEmail(email);
+            if (personalOpt.isPresent()) {
+                Personal personal = personalOpt.get();
+                user = personal.getUser();
+                userName = personal.getNombre() + " " + personal.getApellido();
+            }
         }
         
-        Apoderado apoderado = apoderadoOpt.get();
-        User user = apoderado.getUser();
+        if (user == null) {
+            // Lanzar excepción cuando el email no existe
+            log.warn("Intento de recuperación de contraseña para email no registrado: {}", email);
+            throw new IllegalArgumentException("El email no está registrado en el sistema");
+        }
         
         // Eliminar tokens existentes para este email
         tokenRepository.deleteByEmail(email);
@@ -60,8 +76,7 @@ public class PasswordResetService {
         tokenRepository.save(resetToken);
         
         // Enviar email
-        String apoderadoName = apoderado.getNombre() + " " + apoderado.getApellido();
-        emailService.sendPasswordResetEmail(email, token, apoderadoName);
+        emailService.sendPasswordResetEmail(email, token, userName);
         
         log.info("Token de recuperación de contraseña generado para: {}", email);
     }

@@ -2,14 +2,19 @@ package com.utp.agregates.request;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import com.utp.entity.TipoDocumento;
 import com.utp.entity.Genero;
 import java.time.LocalDate;
 
 @Data
 public class AlumnoRequest {
     
-    @NotNull(message = "El documento de identidad no puede ser nulo")
-    private DocumentoIdentidadRequest documentoIdentidad;
+    @NotNull(message = "El tipo de documento no puede ser nulo")
+    private TipoDocumento tipoDocumento;
+    
+    @NotBlank(message = "El número de documento no puede estar vacío")
+    @Size(min = 8, max = 12, message = "El número de documento debe tener entre 8 y 12 caracteres")
+    private String numeroDocumento;
     
     @NotNull(message = "El ID del apoderado no puede ser nulo")
     private Long apoderadoId;

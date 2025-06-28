@@ -2,11 +2,11 @@ package com.utp.agregates.request;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import com.utp.entity.Role;
 import com.utp.entity.TipoDocumento;
-import com.utp.entity.Parentesco;
 
 @Data
-public class ApoderadoRequest {
+public class PersonalRequest {
     
     @NotNull(message = "El tipo de documento no puede ser nulo")
     private TipoDocumento tipoDocumento;
@@ -19,9 +19,11 @@ public class ApoderadoRequest {
     @Size(min = 3, max = 40, message = "El nombre de usuario debe tener entre 3 y 40 caracteres")
     private String username;
     
-    @NotBlank(message = "La contraseña no puede estar vacía")
     @Size(min = 8, max = 255, message = "La contraseña debe tener entre 8 y 255 caracteres")
     private String password;
+    
+    @NotNull(message = "El rol no puede ser nulo")
+    private Role role;
     
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(max = 50, message = "El nombre no puede exceder los 50 caracteres")
@@ -31,23 +33,8 @@ public class ApoderadoRequest {
     @Size(max = 50, message = "El apellido no puede exceder los 50 caracteres")
     private String apellido;
     
-    @NotNull(message = "El parentesco no puede ser nulo")
-    private Parentesco parentesco;
-    
-    private String direccion;
-    private String departamento;
-    private String provincia;
-    private String distrito;
-    
-    @NotBlank(message = "El teléfono no puede estar vacío")
-    @Pattern(regexp = "^[0-9]{9,15}$", message = "El teléfono debe contener solo números y tener entre 9 y 15 dígitos")
-    private String telefono;
-    
     @Email(message = "El email debe ser válido")
     @NotBlank(message = "El email no puede estar vacío")
     @Size(max = 100, message = "El email no puede exceder los 100 caracteres")
     private String email;
-    
-    private String lugarTrabajo;
-    private String cargo;
 }

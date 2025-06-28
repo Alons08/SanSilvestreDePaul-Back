@@ -50,6 +50,10 @@ public class User implements UserDetails {
     private Apoderado apoderado;
     // Relación opcional (para usuarios APODERADO si es obligatorio)
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Personal personal;
+    // Relación opcional (para usuarios ADMINISTRADOR y SECRETARIA)
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority((role.name())));

@@ -4,6 +4,22 @@
 
 ---
 
+## 📋 ÍNDICE DE NAVEGACIÓN
+
+1. [🔐 AUTENTICACIÓN](#-1-autenticación-auth---sin-token)
+2. [👥 GESTIÓN DE PERSONAL ADMINISTRATIVO](#-2-gestión-de-personal-administrativo-apipersonal)
+3. [🏗️ CREAR ENTIDADES DE CONFIGURACIÓN ESCOLAR](#️-3-crear-entidades-de-configuración-escolar-apisetup)
+4. [�‍👩‍👧‍👦 GESTIÓN DE APODERADOS](#‍‍‍-4-gestión-de-apoderados-apisetup)
+5. [� CONSULTAS Y GESTIÓN DE ENTIDADES](#-5-consultas-y-gestión-de-entidades-apisetup)
+6. [🎓 MATRÍCULAS](#-6-matrículas-apimatrículas)
+7. [💰 GESTIÓN DE PAGOS](#-7-gestión-de-pagos-apipagos)
+8. [🔍 CONSULTAS AVANZADAS DE ALUMNOS Y CUOTAS](#-8-consultas-avanzadas-de-alumnos-y-cuotas-apiadmin)
+9. [🔄 GESTIÓN DE ESTADOS](#-9-gestión-de-estados-apiestados)
+10. [👨‍👩‍👧‍👦 PORTAL APODERADOS](#‍‍‍-10-portal-apoderados-apiapoderado)
+11. [📝 DATOS DE PRUEBA PARA DESARROLLO](#-11-datos-de-prueba-para-desarrollo-apiadmin)
+
+---
+
 ## 🔐 1. AUTENTICACIÓN (`/auth/`) - SIN TOKEN
 
 ### LOGIN
@@ -14,20 +30,7 @@ Content-Type: application/json
 
 {
     "username": "Alonso",
-    "password": "123456"
-}
-```
-
-### REGISTER
-```http
-POST http://localhost:8025/auth/register
-Content-Type: application/json
-🔓 ROL: PÚBLICO (Sin autenticación)
-
-{
-    "username": "nuevo_usuario",
-    "password": "123456",
-    "role": "Administrador"
+    "password": "alonso123"
 }
 ```
 
@@ -36,11 +39,15 @@ Content-Type: application/json
 POST http://localhost:8025/auth/forgot-password
 Content-Type: application/json
 🔓 ROL: PÚBLICO (Sin autenticación)
-⚠️ LIMITACIÓN: Solo funciona para usuarios APODERADO
+✅ COMPATIBLE: Todos los roles (Apoderado, Administrador, Secretaria)
 
 {
-    "email": "apoderado@email.com"
+    "email": "admin@sansilvestro.edu.pe"
 }
+
+# ✅ RESPUESTAS:
+# - Email válido: "Se ha enviado un email con las instrucciones para restablecer tu contraseña"
+# - Email inválido: "El email no está registrado en el sistema"
 ```
 
 ### RESET PASSWORD
@@ -48,7 +55,7 @@ Content-Type: application/json
 POST http://localhost:8025/auth/reset-password
 Content-Type: application/json
 🔓 ROL: PÚBLICO (Sin autenticación)
-⚠️ LIMITACIÓN: Solo funciona para usuarios APODERADO
+✅ COMPATIBLE: Todos los roles (Apoderado, Administrador, Secretaria)
 
 {
     "token": "token_recibido_por_email",
@@ -59,59 +66,100 @@ Content-Type: application/json
 
 ---
 
-## 🧪 2. DEMOS Y TESTING (`/api/v1/`)
+## 👥 2. GESTIÓN DE PERSONAL ADMINISTRATIVO (`/api/personal/`)
 
-### ENDPOINT PARA TODOS
+### LISTAR TODO EL PERSONAL
 ```http
-GET http://localhost:8025/api/v1/todos
-Authorization: Bearer tu_jwt_token
-👥 ROLES: Administrador, Secretaria, Apoderado
-```
-
-### ENDPOINT SOLO APODERADOS
-```http
-GET http://localhost:8025/api/v1/solo
-Authorization: Bearer tu_jwt_token_apoderado
-👤 ROL: Apoderado únicamente
-```
-
-### ENDPOINT SOLO ADMIN
-```http
-GET http://localhost:8025/api/v1/admin
+GET http://localhost:8025/api/personal
 Authorization: Bearer tu_jwt_token_admin
 👑 ROL: Administrador únicamente
 ```
 
----
-
-## 🏗️ 3. SETUP - CREAR ENTIDADES (`/api/setup/`)
-
-### CREAR APODERADO
+### OBTENER PERSONAL POR ID
 ```http
-POST http://localhost:8025/api/setup/apoderados
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
+GET http://localhost:8025/api/personal/1
+Authorization: Bearer tu_jwt_token_admin
+👑 ROL: Administrador únicamente
+```
+
+### CREAR NUEVO PERSONAL
+```http
+POST http://localhost:8025/api/personal
+Authorization: Bearer tu_jwt_token_admin
+👑 ROL: Administrador únicamente
 Content-Type: application/json
 
 {
-    "userId": 1,
-    "nombre": "Carlos",
-    "apellido": "Mendoza",
-    "parentesco": "Padre",
-    "direccion": "Av. Los Padres 456",
-    "departamento": "Lima",
-    "provincia": "Lima",
-    "distrito": "Miraflores",
-    "telefono": "998877665",
-    "email": "carlos.mendoza@email.com",
-    "lugarTrabajo": "Empresa ABC",
-    "cargo": "Gerente",
-    "documentoIdentidad": {
-        "tipoDocumento": "DNI",
-        "numeroDocumento": "87654321"
-    }
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "12345678",
+    "username": "secretaria_nueva",
+    "password": "secretaria123",
+    "role": "Secretaria",
+    "nombre": "María",
+    "apellido": "García",
+    "email": "maria.garcia@sansilvestro.edu.pe"
 }
+
+# ✅ NOTA: Al crear personal se genera automáticamente:
+# - Usuario en el sistema con las credenciales proporcionadas
+# - Registro de personal vinculado al usuario
+# - Documento de identidad asociado
+# - Estado activo por defecto
 ```
+
+### ACTUALIZAR PERSONAL
+```http
+PUT http://localhost:8025/api/personal/1
+Authorization: Bearer tu_jwt_token_admin
+👑 ROL: Administrador únicamente
+Content-Type: application/json
+
+{
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "12345678",
+    "username": "secretaria_actualizada",
+    "password": "nueva_contraseña",  // ⚠️ OPCIONAL: Solo si quieres cambiar la contraseña
+    "role": "Secretaria",
+    "nombre": "María",
+    "apellido": "García Actualizada",
+    "email": "maria.actualizada@sansilvestro.edu.pe"
+}
+
+# ✅ NOTAS:
+# - El campo password es opcional
+# - Si no envías password, se mantiene la contraseña actual
+# - Se valida que el email no esté en uso por otro personal
+```
+
+### CAMBIAR ESTADO DEL PERSONAL
+```http
+PUT http://localhost:8025/api/personal/1/estado?estado=false
+Authorization: Bearer tu_jwt_token_admin
+👑 ROL: Administrador únicamente
+
+# ✅ EFECTO:
+# - Cambia el estado del personal (activo/inactivo)
+# - También actualiza el estado del usuario asociado
+# - Si estado=false, el usuario NO podrá hacer login
+# - Si estado=true, el usuario SÍ podrá hacer login
+```
+
+### ELIMINAR PERSONAL
+```http
+DELETE http://localhost:8025/api/personal/1
+Authorization: Bearer tu_jwt_token_admin
+👑 ROL: Administrador únicamente
+
+# ⚠️ ADVERTENCIA: Elimina permanentemente:
+# - El registro de personal
+# - El usuario asociado
+# - El documento de identidad
+# - Esta acción NO es reversible
+```
+
+---
+
+## 🏗️ 3. CREAR ENTIDADES DE CONFIGURACIÓN ESCOLAR (`/api/setup/`)
 
 ### CREAR DOCENTE
 ```http
@@ -149,49 +197,6 @@ Content-Type: application/json
 }
 ```
 
-### CREAR ALUMNO
-```http
-POST http://localhost:8025/api/setup/alumnos
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-Content-Type: application/json
-
-{
-    "apoderadoId": 1,
-    "nombre": "Ana",
-    "apellido": "Mendoza",
-    "fechaNacimiento": "2017-03-15",
-    "genero": "Femenino",
-    "direccion": "Av. Los Padres 456",
-    "departamento": "Lima",
-    "provincia": "Lima",
-    "distrito": "Miraflores",
-    "tieneDiscapacidad": false,
-    "diagnosticoMedico": null,
-    "documentoIdentidad": {
-        "tipoDocumento": "DNI",
-        "numeroDocumento": "11223344"
-    }
-}
-```
-
-### CREAR AULA
-```http
-POST http://localhost:8025/api/setup/aulas
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-Content-Type: application/json
-
-{
-    "nombre": "Aula A1",
-    "gradoId": 1,
-    "docenteId": 1,
-    "capacidad": 25,
-    "horarioInicio": "08:00:00",
-    "horarioFin": "13:00:00"
-}
-```
-
 ### CREAR CURSO
 ```http
 POST http://localhost:8025/api/setup/cursos
@@ -219,16 +224,92 @@ Content-Type: application/json
 }
 ```
 
----
-
-## 🔍 4. SETUP - CONSULTAS (GET PUT DELETE) (`/api/setup/`)
-
-### LISTAR USUARIOS
+### CREAR AULA
 ```http
-GET http://localhost:8025/api/setup/usuarios
+POST http://localhost:8025/api/setup/aulas
 Authorization: Bearer tu_jwt_token_admin_o_secretaria
 👑🏢 ROLES: Administrador, Secretaria
+Content-Type: application/json
+
+{
+    "nombre": "Aula A1",
+    "gradoId": 1,
+    "docenteId": 1,
+    "capacidad": 25,
+    "horarioInicio": "08:00:00",
+    "horarioFin": "13:00:00"
+}
 ```
+
+---
+
+## 👨‍👩‍👧‍👦 4. GESTIÓN DE APODERADOS (`/api/setup/`)
+
+### CREAR APODERADO - **FORMATO UNIFICADO** ⭐
+```http
+POST http://localhost:8025/api/setup/apoderados
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+Content-Type: application/json
+
+{
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "87654321",
+    "username": "carlos_mendoza",
+    "password": "carlos123",
+    "nombre": "Carlos",
+    "apellido": "Mendoza",
+    "parentesco": "Padre",
+    "direccion": "Av. Los Padres 456",
+    "departamento": "Lima",
+    "provincia": "Lima",
+    "distrito": "Miraflores",
+    "telefono": "998877665",
+    "email": "carlos.mendoza@email.com",
+    "lugarTrabajo": "Empresa ABC",
+    "cargo": "Gerente"
+}
+
+# ✅ FORMATO UNIFICADO: Igual que la creación de Personal
+# ✅ UN SOLO PASO: No necesitas crear usuario primero
+# ✅ AUTOMÁTICO: Se genera todo lo necesario:
+# - Usuario en el sistema con las credenciales proporcionadas
+# - Registro de apoderado vinculado al usuario
+# - Documento de identidad asociado
+# - Estado activo por defecto
+# - Rol Apoderado asignado automáticamente
+```
+
+### CREAR ALUMNO
+```http
+POST http://localhost:8025/api/setup/alumnos
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+Content-Type: application/json
+
+{
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "11223344",
+    "apoderadoId": 1,
+    "nombre": "Ana",
+    "apellido": "Mendoza",
+    "fechaNacimiento": "2017-03-15",
+    "genero": "Femenino",
+    "direccion": "Av. Los Padres 456",
+    "departamento": "Lima",
+    "provincia": "Lima",
+    "distrito": "Miraflores",
+    "tieneDiscapacidad": false,
+    "diagnosticoMedico": null
+}
+
+# ✅ FORMATO UNIFICADO: Campos directos sin objetos anidados
+# ✅ SIMPLIFICADO: tipoDocumento y numeroDocumento como campos simples
+```
+
+---
+
+## 🔍 5. CONSULTAS Y GESTIÓN DE ENTIDADES (`/api/setup/`)
 
 ### LISTAR APODERADOS
 ```http
@@ -287,6 +368,10 @@ Authorization: Bearer tu_jwt_token_admin_o_secretaria
 Content-Type: application/json
 
 {
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "87654321",
+    "username": "carlos_actualizado",
+    "password": "nueva_contraseña",  // ⚠️ OPCIONAL: Solo si quieres cambiar credenciales
     "nombre": "Carlos Actualizado",
     "apellido": "Mendoza",
     "parentesco": "Padre",
@@ -297,12 +382,13 @@ Content-Type: application/json
     "telefono": "999888777",
     "email": "carlos.nuevo@email.com",
     "lugarTrabajo": "Nueva Empresa",
-    "cargo": "Director",
-    "documentoIdentidad": {
-        "tipoDocumento": "DNI",
-        "numeroDocumento": "87654321"
-    }
+    "cargo": "Director"
 }
+
+# ✅ FORMATO UNIFICADO: Campos directos, sin objetos anidados
+# ✅ SIMPLIFICADO: tipoDocumento y numeroDocumento como campos simples
+# ⚠️ NOTA: Los campos username y password son para referencia pero no se usan en actualización
+```
 ```
 
 ### ACTUALIZAR DOCENTE
@@ -336,6 +422,8 @@ Authorization: Bearer tu_jwt_token_admin_o_secretaria
 Content-Type: application/json
 
 {
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "11223344",
     "nombre": "Ana Actualizada",
     "apellido": "Mendoza",
     "fechaNacimiento": "2017-03-15",
@@ -345,12 +433,12 @@ Content-Type: application/json
     "provincia": "Lima",
     "distrito": "San Isidro",
     "tieneDiscapacidad": false,
-    "diagnosticoMedico": null,
-    "documentoIdentidad": {
-        "tipoDocumento": "DNI",
-        "numeroDocumento": "11223344"
-    }
+    "diagnosticoMedico": null
 }
+
+# ✅ FORMATO UNIFICADO: Campos directos sin objetos anidados
+# ✅ SIMPLIFICADO: tipoDocumento y numeroDocumento como campos simples
+```
 ```
 
 ### ACTUALIZAR GRADO
@@ -440,113 +528,7 @@ Authorization: Bearer tu_jwt_token_admin_o_secretaria
 
 ---
 
-## 🎯 5. DATOS DE PRUEBA (`/api/setup/`)
-
-### CREAR DATOS DE PRUEBA COMPLETOS
-```http
-POST http://localhost:8025/api/setup/datos-prueba
-Authorization: Bearer tu_jwt_token_admin
-👑 ROL: Administrador únicamente
-```
-
-### VER FECHAS DE PAGO POR MATRÍCULA
-```http
-GET http://localhost:8025/api/setup/fechas-pago/matricula/1
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
-### VER TODAS LAS FECHAS DE PAGO
-```http
-GET http://localhost:8025/api/setup/fechas-pago
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
----
-
-## 🔄 6. GESTIÓN DE ESTADOS (`/api/estados/`)
-
-### CAMBIAR ESTADO USUARIO
-```http
-PUT http://localhost:8025/api/estados/usuarios/1?estado=true
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
-### CAMBIAR ESTADO APODERADO
-```http
-PUT http://localhost:8025/api/estados/apoderados/1?estado=false
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
-### CAMBIAR ESTADO ALUMNO
-```http
-PUT http://localhost:8025/api/estados/alumnos/1?estado=true
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
-### CAMBIAR ESTADO DOCENTE
-```http
-PUT http://localhost:8025/api/estados/docentes/1?estado=false
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
-### REASIGNAR APODERADO A ALUMNO
-```http
-PUT http://localhost:8025/api/estados/alumnos/1/reasignar-apoderado/2
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
-### LISTAR USUARIOS POR ESTADO
-```http
-GET http://localhost:8025/api/estados/usuarios?estado=true
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
-### LISTAR APODERADOS POR ESTADO
-```http
-GET http://localhost:8025/api/estados/apoderados?estado=false
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
-### LISTAR ALUMNOS POR ESTADO
-```http
-GET http://localhost:8025/api/estados/alumnos?estado=true
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
-### LISTAR DOCENTES POR ESTADO
-```http
-GET http://localhost:8025/api/estados/docentes?estado=true
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
-### LISTAR ALUMNOS SIN APODERADO ACTIVO
-```http
-GET http://localhost:8025/api/estados/alumnos/sin-apoderado-activo
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
-### LISTAR APODERADOS ACTIVOS
-```http
-GET http://localhost:8025/api/estados/apoderados/activos
-Authorization: Bearer tu_jwt_token_admin_o_secretaria
-👑🏢 ROLES: Administrador, Secretaria
-```
-
----
-
-## 🎓 7. MATRÍCULAS (`/api/matriculas/`)
+## 🎓 6. MATRÍCULAS (`/api/matriculas/`)
 
 ### CREAR MATRÍCULA NUEVA
 ```http
@@ -562,7 +544,7 @@ Content-Type: application/json
     "tipoMatricula": "Nueva",
     "observaciones": "Matrícula nueva para el año 2025"
 }
-
+```
 
 ### CREAR MATRÍCULA RATIFICACIÓN
 ```http
@@ -631,7 +613,7 @@ Authorization: Bearer tu_jwt_token
 
 ---
 
-## 💰 8. GESTIÓN DE PAGOS (`/api/pagos/`)
+## 💰 7. GESTIÓN DE PAGOS (`/api/pagos/`)
 
 ### MARCAR CUOTA COMO PAGADA
 ```http
@@ -692,7 +674,7 @@ Authorization: Bearer tu_jwt_token_admin_o_secretaria
 
 ---
 
-## 🔍 8.1. CONSULTAS AVANZADA DE ALUMNOS Y CUOTAS (`/api/admin/`) - **NUEVO**
+## 🔍 8. CONSULTAS AVANZADAS DE ALUMNOS Y CUOTAS (`/api/admin/`)
 
 ### BUSCAR ALUMNOS - **NUEVO**
 ```http
@@ -762,7 +744,72 @@ Authorization: Bearer tu_jwt_token_admin_o_secretaria
 
 ---
 
-## 👨‍👩‍👧‍👦 9. PORTAL APODERADOS (`/api/apoderado/`)
+## 🔄 9. GESTIÓN DE ESTADOS (`/api/estados/`)
+
+### CAMBIAR ESTADO APODERADO
+```http
+PUT http://localhost:8025/api/estados/apoderados/1?estado=false
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+```
+
+### CAMBIAR ESTADO ALUMNO
+```http
+PUT http://localhost:8025/api/estados/alumnos/1?estado=true
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+```
+
+### CAMBIAR ESTADO DOCENTE
+```http
+PUT http://localhost:8025/api/estados/docentes/1?estado=false
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+```
+
+### REASIGNAR APODERADO A ALUMNO
+```http
+PUT http://localhost:8025/api/estados/alumnos/1/reasignar-apoderado/2
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+```
+
+### LISTAR APODERADOS POR ESTADO
+```http
+GET http://localhost:8025/api/estados/apoderados?estado=false
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+```
+
+### LISTAR ALUMNOS POR ESTADO
+```http
+GET http://localhost:8025/api/estados/alumnos?estado=true
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+```
+
+### LISTAR DOCENTES POR ESTADO
+```http
+GET http://localhost:8025/api/estados/docentes?estado=true
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+```
+
+### LISTAR ALUMNOS SIN APODERADO ACTIVO
+```http
+GET http://localhost:8025/api/estados/alumnos/sin-apoderado-activo
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+```
+
+### LISTAR APODERADOS ACTIVOS
+```http
+GET http://localhost:8025/api/estados/apoderados/activos
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+```
+
+## 👨‍👩‍👧‍👦 10. PORTAL APODERADOS (`/api/apoderado/`)
 
 ### DASHBOARD DEL APODERADO
 ```http
@@ -821,7 +868,58 @@ Authorization: Bearer tu_jwt_token_apoderado
 
 ---
 
-## 🔑 LEYENDA DE ROLES Y TOKENS
+## � COMPARACIÓN DE FORMATOS - PERSONAL vs APODERADO
+
+### **FORMATO UNIFICADO** ✅
+Tanto el **Personal** como los **Apoderados** ahora siguen el mismo formato simple:
+
+#### **Crear Personal:**
+```http
+POST http://localhost:8025/api/personal
+{
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "12345678",
+    "username": "secretaria_nueva",
+    "password": "secretaria123",
+    "role": "Secretaria",
+    "nombre": "María",
+    "apellido": "García",
+    "email": "maria.garcia@sansilvestro.edu.pe"
+}
+```
+
+#### **Crear Apoderado (Método Unificado):**
+```http
+POST http://localhost:8025/api/setup/apoderados
+{
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "87654321",
+    "username": "carlos_mendoza",
+    "password": "carlos123",
+    "nombre": "Carlos",
+    "apellido": "Mendoza",
+    "parentesco": "Padre",        // ← Campos adicionales específicos del apoderado
+    "direccion": "Av. Los Padres 456",
+    "departamento": "Lima",
+    "provincia": "Lima",
+    "distrito": "Miraflores",
+    "telefono": "998877665",
+    "email": "carlos.mendoza@email.com",
+    "lugarTrabajo": "Empresa ABC",
+    "cargo": "Gerente"
+}
+```
+
+### **VENTAJAS DEL FORMATO UNIFICADO:**
+- ✅ **Un solo paso:** No necesitas crear usuario primero
+- ✅ **Consistencia:** Ambos formatos son similares
+- ✅ **Simplicidad:** Menos endpoints que recordar
+- ✅ **Automático:** Todo se crea en una sola operación
+- ✅ **Validaciones:** Se verifican duplicados automáticamente
+
+---
+
+## �🔑 LEYENDA DE ROLES Y TOKENS
 
 ### 🔓 PÚBLICO
 Sin token necesario
@@ -849,11 +947,34 @@ Content-Type: application/json
 
 {
     "username": "Alonso",
-    "password": "123456"
+    "password": "alonso123"
 }
+
+# ✅ DATOS COMPLETOS DEL ADMINISTRADOR:
+# Usuario: Alonso / alonso123
+# Email: admin@sansilvestro.edu.pe (para recuperar contraseña)
+# Documento: DNI 12345678
+# Personal: Alonso Administrador
 ```
 
-### 2. Token de Apoderado
+### 2. Token de Secretaria
+```http
+POST http://localhost:8025/auth/login
+Content-Type: application/json
+
+{
+    "username": "Jose",
+    "password": "jose123"
+}
+
+# ✅ DATOS COMPLETOS DE LA SECRETARIA:
+# Usuario: Jose / jose123
+# Email: secretaria@sansilvestro.edu.pe (para recuperar contraseña)
+# Documento: DNI 87654321
+# Personal: José Secretario
+```
+
+### 3. Token de Apoderado
 ```http
 POST http://localhost:8025/auth/login
 Content-Type: application/json
@@ -864,28 +985,24 @@ Content-Type: application/json
 }
 ```
 
-### 3. Token de Secretaria
-**Primero registra un usuario secretaria:**
+### 4. Crear Nueva Secretaria (Opcional)
+**Si necesitas crear personal adicional:**
 ```http
-POST http://localhost:8025/auth/register
+POST http://localhost:8025/api/personal
+Authorization: Bearer tu_jwt_token_admin
 Content-Type: application/json
 
 {
-    "username": "secretaria1",
-    "password": "123456",
-    "role": "Secretaria"
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "98765432",
+    "username": "secretaria_nueva",
+    "password": "secretaria123",
+    "role": "Secretaria",
+    "nombre": "Ana",
+    "apellido": "López",
+    "email": "ana.lopez@sansilvestro.edu.pe"
 }
 ```
-
-**Luego haz login:**
-```http
-POST http://localhost:8025/auth/login
-Content-Type: application/json
-
-{
-    "username": "secretaria1",
-    "password": "123456"
-}
 ```
 
 ---
@@ -933,14 +1050,16 @@ Content-Type: application/json
 ```
 📂 SanSilvestre-API-Endpoints/
 ├── 📁 01-Autenticacion/
-├── 📁 02-Demos-Testing/
-├── 📁 03-Setup-Configuracion/
-├── 📁 04-Administracion/
-├── 📁 05-Gestion-Estados/
-├── 📁 06-Matriculas/
-├── 📁 07-Pagos/
-├── 📁 08-Gestion-Avanzada-Alumnos-Cuotas/ 🆕
-└── 📁 09-Portal-Apoderados/ ⭐ (Incluye nuevo endpoint de cursos)
+├── 📁 02-Gestion-Personal-Administrativo/
+├── 📁 03-Configuracion-Inicial/
+├── 📁 04-Consultas-Listados/
+├── 📁 05-Administracion/
+├── 📁 06-Datos-Prueba/
+├── 📁 07-Gestion-Estados/
+├── 📁 08-Matriculas/
+├── 📁 09-Gestion-Pagos/
+├── 📁 10-Consultas-Avanzadas/
+└── 📁 11-Portal-Apoderados/
 ```
 
 
@@ -956,7 +1075,7 @@ Content-Type: application/json
 
 {
     "username": "Alonso",
-    "password": "123456"
+    "password": "alonso123"
 }
 ```
 **⚠️ Importante:** Guarda el token JWT que recibes para los siguientes pasos.
@@ -1017,28 +1136,18 @@ Content-Type: application/json
 
 ---
 
-### **PASO 3: CREAR USUARIO PARA APODERADO**
+### **PASO 3: CREAR APODERADO (MÉTODO SIMPLIFICADO)**
 
-#### **3.1 Registrar Usuario**
-```http
-POST http://localhost:8025/auth/register
-Content-Type: application/json
-
-{
-    "username": "carlos_mendoza",
-    "password": "123456",
-    "role": "Apoderado"
-}
-```
-
-#### **3.2 Crear Perfil de Apoderado**
 ```http
 POST http://localhost:8025/api/setup/apoderados
 Authorization: Bearer tu_jwt_token_admin_o_secretaria
 Content-Type: application/json
 
 {
-    "userId": 2,
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "87654321",
+    "username": "carlos_mendoza",
+    "password": "carlos123",
     "nombre": "Carlos",
     "apellido": "Mendoza",
     "parentesco": "Padre",
@@ -1049,12 +1158,15 @@ Content-Type: application/json
     "telefono": "998877665",
     "email": "carlos.mendoza@email.com",
     "lugarTrabajo": "Empresa ABC",
-    "cargo": "Gerente",
-    "documentoIdentidad": {
-        "tipoDocumento": "DNI",
-        "numeroDocumento": "87654321"
-    }
+    "cargo": "Gerente"
 }
+
+# ✅ VENTAJAS DEL MÉTODO COMPLETO:
+# - ✅ UN SOLO ENDPOINT (en lugar de 2)
+# - ✅ Crea automáticamente el usuario Y el apoderado
+# - ✅ Rol Apoderado asignado automáticamente
+# - ✅ Estados activos por defecto
+# - ✅ Mismo formato que Personal administrativo
 ```
 
 ---
@@ -1066,6 +1178,8 @@ Authorization: Bearer tu_jwt_token_admin_o_secretaria
 Content-Type: application/json
 
 {
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "11223344",
     "apoderadoId": 1,
     "nombre": "Ana",
     "apellido": "Mendoza",
@@ -1076,12 +1190,11 @@ Content-Type: application/json
     "provincia": "Lima",
     "distrito": "Miraflores",
     "tieneDiscapacidad": false,
-    "diagnosticoMedico": null,
-    "documentoIdentidad": {
-        "tipoDocumento": "DNI",
-        "numeroDocumento": "11223344"
-    }
+    "diagnosticoMedico": null
 }
+
+# ✅ FORMATO UNIFICADO: También usa campos directos como Apoderado y Personal
+```
 ```
 
 ---
@@ -1166,12 +1279,16 @@ Authorization: Bearer token_del_apoderado
 2. **🏗️ Crear Grado** → Base para la matrícula
 3. **👩‍🏫 Crear Docente** → Responsable del aula
 4. **🏫 Crear Aula** → Espacio físico
-5. **👤 Registrar Usuario** → Cuenta para apoderado
-6. **👨‍👩‍👧‍👦 Crear Apoderado** → Perfil del responsable
-7. **🧒 Crear Alumno** → Estudiante a matricular
-8. **🎓 Crear Matrícula** → Genera automáticamente 10 cuotas
-9. **✅ Verificar** → Confirmar datos y pagos
-10. **💰 Gestionar Pagos** → Marcar cuotas como pagadas
+5. **‍👩‍👧‍👦 Crear Apoderado** → Usuario y perfil en UN SOLO PASO
+6. **🧒 Crear Alumno** → Estudiante a matricular
+7. **🎓 Crear Matrícula** → Genera automáticamente 10 cuotas
+8. **✅ Verificar** → Confirmar datos y pagos
+9. **💰 Gestionar Pagos** → Marcar cuotas como pagadas
+
+### **🚀 MEJORAS DEL FLUJO:**
+- ✅ **PASO 5 SIMPLIFICADO:** Ya no necesitas crear usuario separadamente
+- ✅ **MENOS ENDPOINTS:** De 2 pasos a 1 solo paso para apoderados
+- ✅ **CONSISTENCIA:** Mismo formato que Personal administrativo
 
 ---
 
@@ -1200,3 +1317,86 @@ Este endpoint crea automáticamente:
 - 1 alumno matriculado
 - 1 matrícula con 10 cuotas numeradas del 1 al 10 de S/ 200.00
 - **Respuesta completa** con cursos y horario del alumno
+
+---
+
+## 💡 EJEMPLOS COMPARATIVOS - FORMATO UNIFICADO
+
+### **Crear Personal Administrativo:**
+```http
+POST http://localhost:8025/api/personal
+Authorization: Bearer tu_jwt_token_admin
+Content-Type: application/json
+
+{
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "15612357",
+    "username": "secretaria_nueva",
+    "password": "secretaria123",
+    "role": "Secretaria",
+    "nombre": "María",
+    "apellido": "García",
+    "email": "maria.garcia@sansilvestro.edu.pe"
+}
+```
+
+### **Crear Apoderado (Nuevo Formato):**
+```http
+POST http://localhost:8025/api/setup/apoderados
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+Content-Type: application/json
+
+{
+    "tipoDocumento": "DNI",
+    "numeroDocumento": "89654321",
+    "username": "carlos_mendoza",
+    "password": "carlos123",
+    "nombre": "Carlos",
+    "apellido": "Mendoza",
+    "parentesco": "Padre",
+    "direccion": "Av. Los Padres 456",
+    "departamento": "Lima",
+    "provincia": "Lima",
+    "distrito": "Miraflores",
+    "telefono": "998877665",
+    "email": "carlos.mendoza@email.com",
+    "lugarTrabajo": "Empresa ABC",
+    "cargo": "Gerente"
+}
+```
+
+### **🎉 RESULTADO IDÉNTICO EN AMBOS CASOS:**
+- ✅ Usuario creado automáticamente
+- ✅ Perfil asociado (Personal o Apoderado)
+- ✅ Documento de identidad registrado
+- ✅ Estados activos por defecto
+- ✅ Contraseña encriptada
+- ✅ Email único validado
+- ✅ Un solo paso, sin complicaciones
+
+**¡Ahora ambos formatos son igualmente simples!** 🚀
+
+---
+
+## 📝 11. DATOS DE PRUEBA PARA DESARROLLO (`/api/admin/`)
+
+### CREAR DATOS DE PRUEBA COMPLETOS
+```http
+POST http://localhost:8025/api/setup/datos-prueba
+Authorization: Bearer tu_jwt_token_admin
+👑 ROL: Administrador únicamente
+```
+
+### VER FECHAS DE PAGO POR MATRÍCULA
+```http
+GET http://localhost:8025/api/setup/fechas-pago/matricula/1
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+```
+
+### VER TODAS LAS FECHAS DE PAGO
+```http
+GET http://localhost:8025/api/setup/fechas-pago
+Authorization: Bearer tu_jwt_token_admin_o_secretaria
+👑🏢 ROLES: Administrador, Secretaria
+```

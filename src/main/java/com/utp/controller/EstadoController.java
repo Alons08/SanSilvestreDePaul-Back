@@ -1,10 +1,8 @@
 package com.utp.controller;
 
-import com.utp.entity.User;
 import com.utp.entity.Apoderado;
 import com.utp.entity.Alumno;
 import com.utp.entity.Docente;
-import com.utp.repository.UserRepository;
 import com.utp.repository.ApoderadoRepository;
 import com.utp.repository.AlumnoRepository;
 import com.utp.repository.DocenteRepository;
@@ -23,24 +21,12 @@ import java.util.List;
 public class EstadoController {
 
     private final EstadoService estadoService;
-    private final UserRepository userRepository;
     private final ApoderadoRepository apoderadoRepository;
     private final AlumnoRepository alumnoRepository;
     private final DocenteRepository docenteRepository;
 
     // ============= CAMBIAR ESTADOS =============
     
-    @PutMapping("/usuarios/{id}")
-    public ResponseEntity<String> cambiarEstadoUsuario(@PathVariable Integer id, @RequestParam Boolean estado) {
-        try {
-            estadoService.cambiarEstadoUsuario(id, estado);
-            String mensaje = estado ? "Usuario activado exitosamente" : "Usuario desactivado exitosamente";
-            return ResponseEntity.ok(mensaje);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
-    }
-
     @PutMapping("/apoderados/{id}")
     public ResponseEntity<String> cambiarEstadoApoderado(@PathVariable Long id, @RequestParam Boolean estado) {
         try {
@@ -86,16 +72,6 @@ public class EstadoController {
 
     // ============= CONSULTAR POR ESTADO =============
     
-    @GetMapping("/usuarios")
-    public ResponseEntity<List<User>> listarUsuariosPorEstado(@RequestParam Boolean estado) {
-        try {
-            List<User> usuarios = userRepository.findByEstado(estado);
-            return ResponseEntity.ok(usuarios);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
     @GetMapping("/apoderados")
     public ResponseEntity<List<Apoderado>> listarApoderadosPorEstado(@RequestParam Boolean estado) {
         try {

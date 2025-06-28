@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -33,24 +34,45 @@ public class SetupController {
     private final CursoRepository cursoRepository;
     private final GradoCursoRepository gradoCursoRepository;
     private final MatriculaRepository matriculaRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // ============= APODERADOS =============
-    
+
+
     @PostMapping("/apoderados")
     @PreAuthorize("hasAnyAuthority('Administrador', 'Secretaria')")
     public ResponseEntity<String> crearApoderado(@Valid @RequestBody ApoderadoRequest request) {
         try {
-            User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            // Verificar si el email ya existe
+            if (apoderadoRepository.findByEmail(request.getEmail()).isPresent()) {
+                return ResponseEntity.badRequest().body("El email ya está registrado");
+            }
 
+            // Verificar si el nombre de usuario ya existe
+            if (userRepository.existsByUsername(request.getUsername())) {
+                return ResponseEntity.badRequest().body("El nombre de usuario ya está registrado");
+            }
+
+            // Crear documento de identidad
             DocumentoIdentidad documento = DocumentoIdentidad.builder()
-                .tipoDocumento(request.getDocumentoIdentidad().getTipoDocumento())
-                .numeroDocumento(request.getDocumentoIdentidad().getNumeroDocumento())
+                .tipoDocumento(request.getTipoDocumento())
+                .numeroDocumento(request.getNumeroDocumento())
                 .build();
 
+            // Crear usuario
+            User user = User.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.Apoderado)
+                .estado(true)
+                .build();
+
+            User savedUser = userRepository.save(user);
+
+            // Crear apoderado
             Apoderado apoderado = Apoderado.builder()
                 .documentoIdentidad(documento)
-                .user(user)
+                .user(savedUser)
                 .nombre(request.getNombre())
                 .apellido(request.getApellido())
                 .parentesco(request.getParentesco())
@@ -62,6 +84,7 @@ public class SetupController {
                 .email(request.getEmail())
                 .lugarTrabajo(request.getLugarTrabajo())
                 .cargo(request.getCargo())
+                .estado(true)
                 .build();
 
             apoderadoRepository.save(apoderado);
@@ -130,8 +153,8 @@ public class SetupController {
                 .orElseThrow(() -> new RuntimeException("Apoderado no encontrado"));
 
             DocumentoIdentidad documento = DocumentoIdentidad.builder()
-                .tipoDocumento(request.getDocumentoIdentidad().getTipoDocumento())
-                .numeroDocumento(request.getDocumentoIdentidad().getNumeroDocumento())
+                .tipoDocumento(request.getTipoDocumento())
+                .numeroDocumento(request.getNumeroDocumento())
                 .build();
 
             Alumno alumno = Alumno.builder()
@@ -240,13 +263,6 @@ public class SetupController {
 
     // ============= MÉTODOS DE CONSULTA =============
     
-    @GetMapping("/usuarios")
-    @PreAuthorize("hasAnyAuthority('Administrador', 'Secretaria')")
-    public ResponseEntity<List<User>> listarUsuarios() {
-        List<User> usuarios = userRepository.findAll();
-        return ResponseEntity.ok(usuarios);
-    }
-
     @GetMapping("/apoderados")
     @PreAuthorize("hasAnyAuthority('Administrador', 'Secretaria')")
     public ResponseEntity<List<Apoderado>> listarApoderados() {
@@ -459,7 +475,7 @@ public class SetupController {
             
             // Crear usuario para apoderado
             User userApoderado = User.builder()
-                .username("apoderado_demo")
+                .username("apoderado1")
                 .password("$2a$10$2WZj9Y59IqS2qa4rEN2qIOuDGgKZYRpSIQtXuEsba8yVIEPn0U3Ha") // password: "apoderado1"
                 .role(Role.Apoderado)
                 .estado(true)
@@ -476,16 +492,16 @@ public class SetupController {
             Apoderado apoderado = Apoderado.builder()
                 .documentoIdentidad(apoderadoDoc)
                 .user(userApoderado)
-                .nombre("Luis")
-                .apellido("Rodriguez")
+                .nombre("Luis Miguel")
+                .apellido("Rodriguez Gonzales")
                 .parentesco(Parentesco.Padre)
                 .direccion("Av. Las Flores 789")
                 .departamento("Lima")
                 .provincia("Lima")
                 .distrito("San Borja")
-                .telefono("987123456")
-                .email("alonso.lq08@gmail.com")
-                .lugarTrabajo("Empresa Demo")
+                .telefono("931088900")
+                .email("alonsoleandro.dev@gmail.com")
+                .lugarTrabajo("Empresa demo")
                 .cargo("Ingeniero")
                 .build();
             apoderadoRepository.save(apoderado);
