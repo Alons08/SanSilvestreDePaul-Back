@@ -27,8 +27,12 @@ public class ApplicationConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailService());
+        /* ASI ESTABA ANTES
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailService());
+
+         */
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
