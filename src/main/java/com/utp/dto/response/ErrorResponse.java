@@ -1,4 +1,4 @@
-package com.utp.agregates.response;
+package com.utp.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

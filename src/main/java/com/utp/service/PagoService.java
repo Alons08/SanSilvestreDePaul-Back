@@ -1,6 +1,6 @@
 package com.utp.service;
 
-import com.utp.agregates.request.RegistrarPagoRequest;
+import com.utp.dto.request.RegistrarPagoRequest;
 import com.utp.entity.FechaPago;
 
 public interface PagoService {

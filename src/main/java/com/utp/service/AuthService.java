@@ -1,7 +1,7 @@
 package com.utp.service;
 
-import com.utp.agregates.request.LoginRequest;
-import com.utp.agregates.response.AuthResponse;
+import com.utp.dto.request.LoginRequest;
+import com.utp.dto.response.AuthResponse;
 
 public interface AuthService {
 

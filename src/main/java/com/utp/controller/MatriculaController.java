@@ -1,7 +1,7 @@
 package com.utp.controller;
 
-import com.utp.agregates.request.MatriculaRequest;
-import com.utp.agregates.response.MatriculaResponse;
+import com.utp.dto.request.MatriculaRequest;
+import com.utp.dto.response.MatriculaResponse;
 import com.utp.entity.EstadoMatricula;
 import com.utp.service.MatriculaService;
 import com.utp.service.UserService;

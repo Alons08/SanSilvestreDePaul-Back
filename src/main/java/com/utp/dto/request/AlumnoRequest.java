@@ -1,12 +1,13 @@
-package com.utp.agregates.request;
+package com.utp.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import com.utp.entity.Role;
 import com.utp.entity.TipoDocumento;
+import com.utp.entity.Genero;
+import java.time.LocalDate;
 
 @Data
-public class PersonalRequest {
+public class AlumnoRequest {
     
     @NotNull(message = "El tipo de documento no puede ser nulo")
     private TipoDocumento tipoDocumento;
@@ -15,15 +16,8 @@ public class PersonalRequest {
     @Size(min = 8, max = 12, message = "El número de documento debe tener entre 8 y 12 caracteres")
     private String numeroDocumento;
     
-    @NotBlank(message = "El nombre de usuario no puede estar vacío")
-    @Size(min = 3, max = 40, message = "El nombre de usuario debe tener entre 3 y 40 caracteres")
-    private String username;
-    
-    @Size(min = 8, max = 255, message = "La contraseña debe tener entre 8 y 255 caracteres")
-    private String password;
-    
-    @NotNull(message = "El rol no puede ser nulo")
-    private Role role;
+    @NotNull(message = "El ID del apoderado no puede ser nulo")
+    private Long apoderadoId;
     
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(max = 50, message = "El nombre no puede exceder los 50 caracteres")
@@ -33,8 +27,18 @@ public class PersonalRequest {
     @Size(max = 50, message = "El apellido no puede exceder los 50 caracteres")
     private String apellido;
     
-    @Email(message = "El email debe ser válido")
-    @NotBlank(message = "El email no puede estar vacío")
-    @Size(max = 100, message = "El email no puede exceder los 100 caracteres")
-    private String email;
+    @NotNull(message = "La fecha de nacimiento no puede ser nula")
+    @Past(message = "La fecha de nacimiento debe ser en el pasado")
+    private LocalDate fechaNacimiento;
+    
+    @NotNull(message = "El género no puede ser nulo")
+    private Genero genero;
+    
+    private String direccion;
+    private String departamento;
+    private String provincia;
+    private String distrito;
+    
+    private Boolean tieneDiscapacidad = false;
+    private String diagnosticoMedico;
 }

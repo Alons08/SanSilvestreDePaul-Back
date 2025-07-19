@@ -1,10 +1,10 @@
 package com.utp.service.impl;
 
-import com.utp.agregates.request.MatriculaRequest;
-import com.utp.agregates.response.MatriculaResponse;
-import com.utp.agregates.response.FechaPagoResponse;
-import com.utp.agregates.response.CursoAlumnoResponse;
-import com.utp.agregates.response.HorarioResponse;
+import com.utp.dto.request.MatriculaRequest;
+import com.utp.dto.response.MatriculaResponse;
+import com.utp.dto.response.FechaPagoResponse;
+import com.utp.dto.response.CursoAlumnoResponse;
+import com.utp.dto.response.HorarioResponse;
 import com.utp.entity.*;
 import com.utp.repository.*;
 import com.utp.service.MatriculaService;

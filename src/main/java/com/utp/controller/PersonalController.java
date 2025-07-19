@@ -1,8 +1,8 @@
 package com.utp.controller;
 
-import com.utp.agregates.request.PersonalRequest;
-import com.utp.agregates.response.BaseResponse;
-import com.utp.agregates.response.PersonalResponse;
+import com.utp.dto.request.PersonalRequest;
+import com.utp.dto.response.BaseResponse;
+import com.utp.dto.response.PersonalResponse;
 import com.utp.entity.*;
 import com.utp.repository.PersonalRepository;
 import com.utp.repository.UserRepository;

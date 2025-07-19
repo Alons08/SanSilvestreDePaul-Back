@@ -1,7 +1,7 @@
 package com.utp.service.impl;
 
-import com.utp.agregates.request.AlumnoRequest;
-import com.utp.agregates.response.AlumnoInfoResponse;
+import com.utp.dto.request.AlumnoRequest;
+import com.utp.dto.response.AlumnoInfoResponse;
 import com.utp.entity.*;
 import com.utp.repository.*;
 import com.utp.service.AlumnoService;

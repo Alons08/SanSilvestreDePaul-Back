@@ -1,10 +1,10 @@
 package com.utp.controller;
 
-import com.utp.agregates.request.ForgotPasswordRequest;
-import com.utp.agregates.request.LoginRequest;
-import com.utp.agregates.request.ResetPasswordRequest;
-import com.utp.agregates.response.AuthResponse;
-import com.utp.agregates.response.BaseResponse;
+import com.utp.dto.request.ForgotPasswordRequest;
+import com.utp.dto.request.LoginRequest;
+import com.utp.dto.request.ResetPasswordRequest;
+import com.utp.dto.response.AuthResponse;
+import com.utp.dto.response.BaseResponse;
 import com.utp.service.AuthService;
 import com.utp.service.impl.PasswordResetService;
 import jakarta.validation.Valid;

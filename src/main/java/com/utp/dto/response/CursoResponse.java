@@ -1,4 +1,4 @@
-package com.utp.agregates.response;
+package com.utp.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponse {
-
-    String token;
-    String message;
-    boolean success;
-
+public class CursoResponse {
+    private Long id;
+    private String nombre;
+    private String descripcion;
 }

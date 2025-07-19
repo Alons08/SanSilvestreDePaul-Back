@@ -1,4 +1,4 @@
-package com.utp.agregates.request;
+package com.utp.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;

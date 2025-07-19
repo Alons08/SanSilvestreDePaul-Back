@@ -1,7 +1,7 @@
 package com.utp.service.impl;
 
-import com.utp.agregates.request.LoginRequest;
-import com.utp.agregates.response.AuthResponse;
+import com.utp.dto.request.LoginRequest;
+import com.utp.dto.response.AuthResponse;
 import com.utp.config.JwtService;
 import com.utp.repository.UserRepository;
 

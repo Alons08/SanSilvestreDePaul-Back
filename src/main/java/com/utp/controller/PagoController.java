@@ -1,7 +1,7 @@
 package com.utp.controller;
 
-import com.utp.agregates.request.RegistrarPagoRequest;
-import com.utp.agregates.response.FechaPagoResponse;
+import com.utp.dto.request.RegistrarPagoRequest;
+import com.utp.dto.response.FechaPagoResponse;
 import com.utp.entity.FechaPago;
 import com.utp.repository.FechaPagoRepository;
 import com.utp.service.PagoService;

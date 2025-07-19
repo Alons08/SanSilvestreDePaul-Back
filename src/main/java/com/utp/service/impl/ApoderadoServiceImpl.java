@@ -1,6 +1,6 @@
 package com.utp.service.impl;
 
-import com.utp.agregates.response.*;
+import com.utp.dto.response.*;
 import com.utp.entity.*;
 import com.utp.repository.*;
 import com.utp.service.ApoderadoService;

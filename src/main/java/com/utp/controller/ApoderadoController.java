@@ -1,9 +1,9 @@
 package com.utp.controller;
 
-import com.utp.agregates.response.ApoderadoDashboardResponse;
-import com.utp.agregates.response.FechaPagoResponse;
-import com.utp.agregates.response.HorarioResponse;
-import com.utp.agregates.response.CursoAlumnoResponse;
+import com.utp.dto.response.ApoderadoDashboardResponse;
+import com.utp.dto.response.FechaPagoResponse;
+import com.utp.dto.response.HorarioResponse;
+import com.utp.dto.response.CursoAlumnoResponse;
 import com.utp.service.ApoderadoService;
 import com.utp.service.UserService;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.utp.controller;
 
-import com.utp.agregates.request.*;
-import com.utp.agregates.response.AlumnoInfoResponse;
+import com.utp.dto.request.*;
+import com.utp.dto.response.AlumnoInfoResponse;
 import com.utp.entity.*;
 import com.utp.repository.*;
 import com.utp.service.AlumnoService;

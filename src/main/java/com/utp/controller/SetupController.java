@@ -1,7 +1,7 @@
 package com.utp.controller;
 
-import com.utp.agregates.request.*;
-import com.utp.agregates.response.*;
+import com.utp.dto.request.*;
+import com.utp.dto.response.*;
 import com.utp.entity.*;
 import com.utp.repository.*;
 import jakarta.validation.Valid;

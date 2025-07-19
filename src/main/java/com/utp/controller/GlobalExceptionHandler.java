@@ -1,6 +1,6 @@
 package com.utp.controller;
 
-import com.utp.agregates.response.ErrorResponse;
+import com.utp.dto.response.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
