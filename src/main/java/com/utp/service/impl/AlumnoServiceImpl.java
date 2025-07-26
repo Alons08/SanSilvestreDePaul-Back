@@ -33,7 +33,7 @@ public class AlumnoServiceImpl implements AlumnoService {
             .numeroDocumento(request.getNumeroDocumento())
             .build();
 
-        // Crear alumno
+        // Crear alumno builder
         Alumno alumno = Alumno.builder()
             .documentoIdentidad(documento)
             .apoderado(apoderado)
